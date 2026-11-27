@@ -1,0 +1,1 @@
+import{g as e}from"./primitives-BtLI7DPO.js";import{t}from"./ToolPage-DNK6CwWB.js";import{n}from"./NetTools-CFhegDeL.js";var r=e(),i=()=>(0,r.jsx)(t,{current:`/tools/dns-lookup`,title:`DNS Lookup`,sub:`Look up A, AAAA, MX, TXT, NS and other DNS records for any domain.`,children:(0,r.jsx)(n,{})});export{i as component};

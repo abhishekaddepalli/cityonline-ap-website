@@ -1,0 +1,23 @@
+---
+deployment:
+  tasks:
+    # =========================================================================
+    # cPanel Git Version Control Deployment Script
+    # Project: City Online AP Pvt. Ltd. (Infiniforge Technologies)
+    # =========================================================================
+    # Method A (Standard Single Directory / Subdomain):
+    # If your cPanel domain's Document Root points to this repository's /public
+    # folder, no copying is needed. Git pull updates everything in place.
+    #
+    # Method B (Deployment to public_html):
+    # Set DEPLOYPATH to your web root (e.g. /home/$USER/public_html)
+    - export DEPLOYPATH=/home/$USER/public_html
+    - /bin/mkdir -p $DEPLOYPATH
+    
+    # Sync pre-compiled public assets, HTML, and PHP front controller into public_html
+    - /bin/rsync -av --update public/ $DEPLOYPATH/
+    
+    # Ensure secure directory permissions for Apache / LiteSpeed
+    - /bin/chmod 755 $DEPLOYPATH
+    - /bin/chmod -R 755 $DEPLOYPATH/assets
+    - /bin/chmod -R 775 storage bootstrap/cache

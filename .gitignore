@@ -1,0 +1,59 @@
+# Logs
+logs
+*.log
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+pnpm-debug.log*
+lerna-debug.log*
+
+# Dependencies
+/node_modules
+/vendor
+
+# Laravel Environment & Secrets
+.env
+.env.backup
+.env.production
+database/*.sqlite
+database/*.sqlite-journal
+/storage/*.key
+/storage/installed.lock
+
+# Storage & Cache (preserve directory structure)
+/storage/app/backups/*
+!/storage/app/backups/.gitkeep
+/storage/framework/cache/data/*
+!/storage/framework/cache/data/.gitkeep
+/storage/framework/sessions/*
+!/storage/framework/sessions/.gitkeep
+/storage/framework/views/*
+!/storage/framework/views/.gitkeep
+/bootstrap/cache/*
+!/bootstrap/cache/.gitkeep
+.phpunit.result.cache
+
+# Node Build & Temporary
+/dist
+/dist-ssr
+/.output
+/.vinxi
+/.tanstack/**
+/.nitro
+*.local
+
+# Wrangler / Cloudflare
+/.wrangler/
+.dev.vars
+
+# Editor & OS
+.vscode/*
+!.vscode/extensions.json
+.idea
+.DS_Store
+Thumbs.db
+*.suo
+*.ntvs*
+*.njsproj
+*.sln
+*.sw?
