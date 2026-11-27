@@ -200,7 +200,8 @@
                         <div class="grid sm:grid-cols-2 gap-4">
                             <div>
                                 <label class="block text-xs font-bold text-slate-700 uppercase mb-1">Database Host</label>
-                                <input type="text" id="db_host" value="127.0.0.1" class="w-full px-4 py-2.5 rounded-xl border border-slate-300 text-sm focus:border-brand-blue outline-none" placeholder="localhost or 127.0.0.1">
+                                <input type="text" id="db_host" value="localhost" class="w-full px-4 py-2.5 rounded-xl border border-slate-300 text-sm focus:border-brand-blue outline-none" placeholder="localhost or 127.0.0.1">
+                                <span class="text-xs text-slate-400 mt-1 block">Standard cPanel hosts use <code>localhost</code>.</span>
                             </div>
                             <div>
                                 <label class="block text-xs font-bold text-slate-700 uppercase mb-1">Database Port</label>
@@ -307,7 +308,8 @@
                     <div class="grid sm:grid-cols-2 gap-4">
                         <div>
                             <label class="block text-xs font-bold text-slate-700 uppercase mb-1">Website URL</label>
-                            <input type="url" id="website_url" value="https://cityonlineap.com" class="w-full px-4 py-2.5 rounded-xl border border-slate-300 text-sm focus:border-brand-blue outline-none">
+                            <input type="url" id="website_url" value="{{ request()->root() ?: 'https://cityonline.infiniforge.cloud' }}" class="w-full px-4 py-2.5 rounded-xl border border-slate-300 text-sm focus:border-brand-blue outline-none">
+                            <span class="text-xs text-slate-400 mt-1 block">Auto-detected from current domain.</span>
                         </div>
                         <div>
                             <label class="block text-xs font-bold text-slate-700 uppercase mb-1">Company Email</label>
@@ -368,7 +370,14 @@
                 <div id="installing-spinner" class="text-center py-8">
                     <div class="inline-block animate-spin rounded-full h-12 w-12 border-4 border-brand-orange border-t-transparent mb-4"></div>
                     <h3 class="text-lg font-bold text-brand-navy">Installing City Online AP Website...</h3>
-                    <p class="text-sm text-slate-500 mt-1">Executing database migrations, seeding verified broadband plans, creating admin account, and securing the installation.</p>
+                    <p class="text-sm text-slate-500 mt-1">Executing database migrations, seeding verified broadband plans, and creating your admin account.</p>
+                    
+                    <div class="mt-4">
+                        <span id="install-stage-msg" class="text-xs font-semibold text-brand-blue bg-blue-50 border border-blue-100 px-3 py-1.5 rounded-lg inline-flex items-center gap-2">
+                            <span class="w-2 h-2 rounded-full bg-brand-orange animate-ping"></span>
+                            Connecting to database...
+                        </span>
+                    </div>
                 </div>
 
                 <div id="install-complete" class="hidden text-center py-6">
@@ -377,15 +386,32 @@
                     </div>
                     <h2 class="text-2xl sm:text-3xl font-extrabold text-brand-navy">Your website is ready!</h2>
                     <p class="text-slate-600 text-sm sm:text-base mt-2 max-w-md mx-auto">
-                        Installation completed successfully. The installer has been permanently locked for security. You can now visit your website or access the admin panel.
+                        Installation completed successfully. The installer has been permanently secured and locked.
                     </p>
 
+                    <!-- Deployment Summary Box -->
+                    <div class="mt-6 p-4 rounded-xl bg-slate-50 border border-slate-200 text-left max-w-md mx-auto text-xs space-y-2.5">
+                        <div class="flex justify-between items-center pb-2 border-b border-slate-200">
+                            <span class="text-slate-500 font-medium">Public Website:</span>
+                            <a id="complete-web-url" href="/" target="_blank" class="font-bold text-brand-navy hover:underline">/</a>
+                        </div>
+                        <div class="flex justify-between items-center pb-2 border-b border-slate-200">
+                            <span class="text-slate-500 font-medium">Admin Login URL:</span>
+                            <a id="complete-admin-url" href="/admin/login" class="font-bold text-brand-orange hover:underline">/admin/login</a>
+                        </div>
+                        <div class="flex justify-between items-center">
+                            <span class="text-slate-500 font-medium">Administrator Email:</span>
+                            <span id="complete-admin-email" class="font-mono font-bold text-slate-800">admin@cityonlineap.com</span>
+                        </div>
+                    </div>
+
                     <div class="mt-8 flex flex-col sm:flex-row gap-4 justify-center">
-                        <a href="/" class="px-6 py-3 rounded-xl font-bold text-brand-navy border border-slate-300 bg-white hover:bg-slate-50 transition shadow-sm">
+                        <a id="btn-visit-site" href="/" class="px-6 py-3 rounded-xl font-bold text-brand-navy border border-slate-300 bg-white hover:bg-slate-50 transition shadow-sm text-center">
                             Visit Website
                         </a>
-                        <a href="/admin/login" class="px-6 py-3 rounded-xl font-bold text-white bg-brand-orange hover:bg-brand-orangeHover transition shadow-lg shadow-orange-500/20">
-                            Open Admin Dashboard
+                        <a id="btn-admin-login" href="/admin/login" class="px-6 py-3 rounded-xl font-bold text-white bg-brand-orange hover:bg-brand-orangeHover transition shadow-lg shadow-orange-500/20 text-center flex items-center justify-center gap-2">
+                            <span>Open Admin Dashboard</span>
+                            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14 5l7 7m0 0l-7 7m7-7H3"/></svg>
                         </a>
                     </div>
                 </div>
@@ -401,6 +427,14 @@
     </footer>
 
     <script>
+        // Auto-detect current URL origin
+        document.addEventListener('DOMContentLoaded', () => {
+            const urlInput = document.getElementById('website_url');
+            if (urlInput && window.location.origin && window.location.origin.startsWith('http')) {
+                urlInput.value = window.location.origin;
+            }
+        });
+
         function goToStep(step) {
             for (let i = 1; i <= 6; i++) {
                 const el = document.getElementById('step-' + i);
@@ -453,9 +487,15 @@
                     headers: { 'Content-Type': 'application/json', 'Accept': 'application/json' },
                     body: JSON.stringify(payload)
                 });
-                const data = await res.json();
+                const raw = await res.text();
+                let data;
+                try { data = JSON.parse(raw); } catch (e) { data = { success: false, message: raw.replace(/<[^>]*>?/gm, ' ').substring(0, 200) }; }
+
                 resultBox.classList.remove('bg-slate-100', 'text-slate-700', 'border-slate-200');
                 if (res.ok && data.success) {
+                    if (data.detected_host && data.detected_host !== 'sqlite') {
+                        document.getElementById('db_host').value = data.detected_host;
+                    }
                     resultBox.classList.add('bg-emerald-50', 'text-emerald-700', 'border', 'border-emerald-200');
                     resultBox.innerHTML = '✓ ' + data.message;
                 } else {
@@ -465,7 +505,7 @@
             } catch (err) {
                 resultBox.classList.remove('bg-slate-100', 'text-slate-700', 'border-slate-200');
                 resultBox.classList.add('bg-red-50', 'text-red-700', 'border', 'border-red-200');
-                resultBox.innerHTML = '✗ Network error testing database.';
+                resultBox.innerHTML = '✗ Connection timed out or network error.';
             }
         }
 
@@ -508,7 +548,29 @@
             document.getElementById('install-complete').classList.add('hidden');
             document.getElementById('install-error').classList.add('hidden');
 
+            // Live stage feedback
+            const stages = [
+                'Connecting to MySQL database...',
+                'Verifying database permissions...',
+                'Executing database schema migrations...',
+                'Seeding broadband plans and localities...',
+                'Creating administrator account...',
+                'Securing installation and locking wizard...'
+            ];
+            let stageIdx = 0;
+            const stageEl = document.getElementById('install-stage-msg');
+            const stageTimer = setInterval(() => {
+                if (stageIdx < stages.length - 1) {
+                    stageIdx++;
+                    if (stageEl) {
+                        stageEl.innerHTML = '<span class="w-2 h-2 rounded-full bg-brand-orange animate-ping"></span> ' + stages[stageIdx];
+                    }
+                }
+            }, 3000);
+
             const conn = document.getElementById('db_connection').value;
+            const originUrl = window.location.origin || document.getElementById('website_url').value;
+
             const payload = {
                 db_connection: conn,
                 db_host: document.getElementById('db_host').value,
@@ -523,7 +585,7 @@
                 admin_password_confirmation: document.getElementById('admin_password_confirmation').value,
                 company_name: document.getElementById('company_name').value,
                 website_name: document.getElementById('website_name').value,
-                website_url: document.getElementById('website_url').value,
+                website_url: originUrl,
                 company_email: document.getElementById('company_email').value,
                 phone_new: document.getElementById('phone_new').value,
                 phone_support: document.getElementById('phone_support').value,
@@ -535,16 +597,46 @@
                 currency: document.getElementById('currency').value,
             };
 
+            const abortController = new AbortController();
+            const timeout = setTimeout(() => abortController.abort(), 120000);
+
             try {
                 const res = await fetch('/install/run', {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json', 'Accept': 'application/json' },
-                    body: JSON.stringify(payload)
+                    body: JSON.stringify(payload),
+                    signal: abortController.signal
                 });
-                const data = await res.json();
+                clearTimeout(timeout);
+                clearInterval(stageTimer);
+
+                const rawText = await res.text();
+                let data;
+                try {
+                    data = JSON.parse(rawText);
+                } catch (pe) {
+                    const cleanErr = rawText.replace(/<[^>]*>?/gm, ' ').replace(/\s+/g, ' ').trim().substring(0, 300);
+                    throw new Error(cleanErr || 'Server returned non-JSON response (Status ' + res.status + ')');
+                }
+
                 document.getElementById('installing-spinner').classList.add('hidden');
 
                 if (res.ok && data.success) {
+                    // Update completion view with actual URLs
+                    const liveWebUrl = originUrl + '/';
+                    const liveAdminUrl = originUrl + '/admin/login';
+
+                    document.getElementById('complete-web-url').href = liveWebUrl;
+                    document.getElementById('complete-web-url').innerText = liveWebUrl;
+
+                    document.getElementById('complete-admin-url').href = liveAdminUrl;
+                    document.getElementById('complete-admin-url').innerText = liveAdminUrl;
+
+                    document.getElementById('complete-admin-email').innerText = payload.admin_email;
+
+                    document.getElementById('btn-visit-site').href = liveWebUrl;
+                    document.getElementById('btn-admin-login').href = liveAdminUrl;
+
                     document.getElementById('install-complete').classList.remove('hidden');
                 } else {
                     document.getElementById('install-error').classList.remove('hidden');
@@ -552,9 +644,13 @@
                     btn.disabled = false;
                 }
             } catch (err) {
+                clearTimeout(timeout);
+                clearInterval(stageTimer);
                 document.getElementById('installing-spinner').classList.add('hidden');
                 document.getElementById('install-error').classList.remove('hidden');
-                document.getElementById('install-error').innerText = 'A network error occurred while running the installation.';
+                document.getElementById('install-error').innerText = err.name === 'AbortError'
+                    ? 'Installation timed out after 120 seconds. Please check your MySQL database connection or server resources.'
+                    : (err.message || 'A network error occurred while running the installation.');
                 btn.disabled = false;
             }
         }

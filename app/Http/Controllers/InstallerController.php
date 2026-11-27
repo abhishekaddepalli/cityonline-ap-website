@@ -115,32 +115,65 @@ class InstallerController extends Controller
         try {
             if ($validated['db_connection'] === 'sqlite') {
                 $dbPath = base_path($validated['db_database']);
-                if (!file_exists($dbPath)) {
-                    touch($dbPath);
+                $dbDir = dirname($dbPath);
+                if (!file_exists($dbDir)) {
+                    @mkdir($dbDir, 0755, true);
                 }
-                new PDO('sqlite:'.$dbPath);
-            } else {
-                $dsn = sprintf(
-                    'mysql:host=%s;port=%s;dbname=%s;charset=utf8mb4',
-                    $validated['db_host'] ?? '127.0.0.1',
-                    $validated['db_port'] ?? '3306',
-                    $validated['db_database']
-                );
-                $pdo = new PDO($dsn, $validated['db_username'] ?? 'root', $validated['db_password'] ?? '', [
-                    PDO::ATTR_ERRMODE => PDO::ERRMODE_EXCEPTION,
-                    PDO::ATTR_TIMEOUT => 5,
+                if (!file_exists($dbPath)) {
+                    @touch($dbPath);
+                }
+                new PDO('sqlite:' . $dbPath);
+                return response()->json([
+                    'success' => true,
+                    'message' => 'SQLite database file is accessible!',
+                    'detected_host' => 'sqlite',
                 ]);
-                $pdo->query('SELECT 1');
+            }
+
+            $preferredHost = trim($validated['db_host'] ?: 'localhost');
+            $dbPort = $validated['db_port'] ?: '3306';
+            $dbDatabase = $validated['db_database'];
+            $dbUser = $validated['db_username'] ?? '';
+            $dbPass = $validated['db_password'] ?? '';
+
+            // Try the user's host first, followed by localhost and 127.0.0.1
+            $hostsToTry = array_unique([$preferredHost, 'localhost', '127.0.0.1']);
+            $connected = false;
+            $workingHost = $preferredHost;
+            $lastError = '';
+
+            foreach ($hostsToTry as $host) {
+                try {
+                    $dsn = sprintf('mysql:host=%s;port=%s;dbname=%s;charset=utf8mb4', $host, $dbPort, $dbDatabase);
+                    $pdo = new PDO($dsn, $dbUser, $dbPass, [
+                        PDO::ATTR_ERRMODE => PDO::ERRMODE_EXCEPTION,
+                        PDO::ATTR_TIMEOUT => 4,
+                    ]);
+                    $pdo->query('SELECT 1');
+                    $connected = true;
+                    $workingHost = $host;
+                    break;
+                } catch (\Throwable $e) {
+                    $lastError = $e->getMessage();
+                }
+            }
+
+            if (!$connected) {
+                return response()->json([
+                    'success' => false,
+                    'message' => 'Connection failed: ' . $lastError,
+                ], 422);
             }
 
             return response()->json([
                 'success' => true,
                 'message' => 'Database connection successful! You can now proceed to the next step.',
+                'detected_host' => $workingHost,
             ]);
-        } catch (Exception $e) {
+        } catch (\Throwable $e) {
             return response()->json([
                 'success' => false,
-                'message' => 'Connection failed: ' . $e->getMessage(),
+                'message' => 'Connection error: ' . $e->getMessage(),
             ], 422);
         }
     }
@@ -148,8 +181,16 @@ class InstallerController extends Controller
     public function install(Request $request)
     {
         if (CheckInstallation::isInstalled()) {
-            return response()->json(['error' => 'Installation is already locked.'], 403);
+            return response()->json([
+                'success' => true,
+                'message' => 'Installation is already completed and locked.',
+                'redirect_url' => url('/admin/login'),
+            ]);
         }
+
+        @set_time_limit(300);
+        @ini_set('max_execution_time', '300');
+        @ini_set('memory_limit', '256M');
 
         $validated = $request->validate([
             // Database
@@ -182,51 +223,111 @@ class InstallerController extends Controller
         ]);
 
         try {
-            // 1. Update .env configuration
+            $dbConnection = $validated['db_connection'];
+            $dbHost = trim($validated['db_host'] ?: 'localhost');
+            $dbPort = $validated['db_port'] ?: '3306';
+            $dbDatabase = $validated['db_database'];
+            $dbUsername = $validated['db_username'] ?? '';
+            $dbPassword = $validated['db_password'] ?? '';
+
+            // 1. FAST PRE-FLIGHT DATABASE VERIFICATION
+            if ($dbConnection === 'mysql') {
+                $hostsToTry = array_unique([$dbHost, 'localhost', '127.0.0.1']);
+                $connected = false;
+                $workingHost = $dbHost;
+                $lastDbError = '';
+
+                foreach ($hostsToTry as $host) {
+                    try {
+                        $dsn = sprintf('mysql:host=%s;port=%s;dbname=%s;charset=utf8mb4', $host, $dbPort, $dbDatabase);
+                        $pdo = new PDO($dsn, $dbUsername, $dbPassword, [
+                            PDO::ATTR_ERRMODE => PDO::ERRMODE_EXCEPTION,
+                            PDO::ATTR_TIMEOUT => 4,
+                        ]);
+                        $pdo->query('SELECT 1');
+                        $connected = true;
+                        $workingHost = $host;
+                        break;
+                    } catch (\Throwable $ex) {
+                        $lastDbError = $ex->getMessage();
+                    }
+                }
+
+                if (!$connected) {
+                    return response()->json([
+                        'success' => false,
+                        'message' => 'Could not connect to MySQL database: ' . $lastDbError . '. Please double-check your database name, username and password in Step 3.',
+                    ], 422);
+                }
+
+                $dbHost = $workingHost;
+            } else {
+                $dbPath = base_path($dbDatabase);
+                $dbDir = dirname($dbPath);
+                if (!file_exists($dbDir)) {
+                    @mkdir($dbDir, 0755, true);
+                }
+                if (!file_exists($dbPath)) {
+                    @touch($dbPath);
+                }
+            }
+
+            // 2. Safe .env update (no regex backreference bugs with $ passwords)
             $envUpdates = [
                 'APP_NAME' => '"' . addslashes($validated['website_name']) . '"',
                 'APP_URL' => rtrim($validated['website_url'], '/'),
-                'DB_CONNECTION' => $validated['db_connection'],
+                'DB_CONNECTION' => $dbConnection,
             ];
 
-            if ($validated['db_connection'] === 'mysql') {
-                $envUpdates['DB_HOST'] = $validated['db_host'] ?? '127.0.0.1';
-                $envUpdates['DB_PORT'] = $validated['db_port'] ?? '3306';
-                $envUpdates['DB_DATABASE'] = $validated['db_database'];
-                $envUpdates['DB_USERNAME'] = $validated['db_username'] ?? 'root';
-                $envUpdates['DB_PASSWORD'] = '"' . addslashes($validated['db_password'] ?? '') . '"';
+            if ($dbConnection === 'mysql') {
+                $envUpdates['DB_HOST'] = $dbHost;
+                $envUpdates['DB_PORT'] = $dbPort;
+                $envUpdates['DB_DATABASE'] = $dbDatabase;
+                $envUpdates['DB_USERNAME'] = $dbUsername;
+                $envUpdates['DB_PASSWORD'] = '"' . addslashes($dbPassword) . '"';
             } else {
-                $envUpdates['DB_DATABASE'] = '"' . $validated['db_database'] . '"';
+                $envUpdates['DB_DATABASE'] = '"' . $dbDatabase . '"';
+            }
+
+            // Ensure APP_KEY exists
+            if (empty(config('app.key')) || config('app.key') === 'base64:Xz9Xgeegq5lmzsVudL4XYjsO/NJx93yW3pyFhc3t1H4=') {
+                $newKey = 'base64:' . base64_encode(random_bytes(32));
+                config(['app.key' => $newKey]);
+                $envUpdates['APP_KEY'] = $newKey;
             }
 
             $this->updateEnvFile($envUpdates);
 
-            // Reconnect DB dynamically for this request
+            // 3. Reconnect DB dynamically for this request
             config([
-                'database.default' => $validated['db_connection'],
-                'database.connections.' . $validated['db_connection'] => array_merge(
-                    config('database.connections.' . $validated['db_connection'], []),
+                'database.default' => $dbConnection,
+                'database.connections.' . $dbConnection => array_merge(
+                    config('database.connections.' . $dbConnection, []),
                     [
-                        'host' => $validated['db_host'] ?? '127.0.0.1',
-                        'port' => $validated['db_port'] ?? '3306',
-                        'database' => $validated['db_connection'] === 'sqlite' ? base_path($validated['db_database']) : $validated['db_database'],
-                        'username' => $validated['db_username'] ?? 'root',
-                        'password' => $validated['db_password'] ?? '',
+                        'host' => $dbHost,
+                        'port' => $dbPort,
+                        'database' => $dbConnection === 'sqlite' ? base_path($dbDatabase) : $dbDatabase,
+                        'username' => $dbUsername,
+                        'password' => $dbPassword,
+                        'options' => [
+                            PDO::ATTR_TIMEOUT => 10,
+                        ],
                     ]
                 ),
             ]);
             DB::purge();
             DB::reconnect();
 
-            // 2. Run migrations
-            Artisan::call('migrate:fresh', ['--force' => true]);
+            // 4. Run migrations with --force (safer & faster than migrate:fresh on shared hosts)
+            Artisan::call('migrate', ['--force' => true]);
 
-            // 3. Run initial seeders
+            // 5. Run initial seeders with --force
             Artisan::call('db:seed', ['--force' => true]);
 
-            // 4. Create or update Super Administrator
+            // 6. Create or update Super Administrator
             $superAdminRole = Role::firstOrCreate(['slug' => 'super-admin'], [
                 'name' => 'Super Administrator',
+                'description' => 'Full system access and configuration',
                 'permissions' => ['*'],
             ]);
 
@@ -241,7 +342,7 @@ class InstallerController extends Controller
                 ]
             );
 
-            // 5. Update Company Settings
+            // 7. Update Company Settings
             Setting::set('company_name', $validated['company_name'], 'company', 'string', true);
             Setting::set('display_name', $validated['website_name'], 'company', 'string', true);
             Setting::set('email_support', $validated['company_email'], 'contact', 'string', true);
@@ -254,28 +355,23 @@ class InstallerController extends Controller
             Setting::set('timezone', $validated['timezone'], 'general', 'string', true);
             Setting::set('currency_symbol', $validated['currency'], 'general', 'string', true);
 
-            // 6. Generate app key if needed
-            if (empty(config('app.key'))) {
-                Artisan::call('key:generate', ['--force' => true]);
-            }
-
-            // 7. Automatically create public storage symlink (no terminal needed)
-            try {
-                Artisan::call('storage:link');
-            } catch (\Throwable $symlinkError) {
+            // 8. Safely link public storage if symlink is supported
+            if (!file_exists(public_path('storage')) && function_exists('symlink')) {
                 $target = storage_path('app/public');
                 $link = public_path('storage');
-                if (!file_exists($link) && file_exists($target)) {
+                if (file_exists($target)) {
                     @symlink($target, $link);
                 }
             }
 
-            // 8. Write permanent installation lock file
+            // 9. Write permanent installation lock file
             $lockData = json_encode([
                 'installed_at' => now()->toIso8601String(),
                 'version' => '1.0.0',
                 'environment' => app()->environment(),
                 'admin_email' => $validated['admin_email'],
+                'admin_username' => $validated['admin_username'],
+                'site_url' => $validated['website_url'],
             ], JSON_PRETTY_PRINT);
 
             file_put_contents(storage_path('installed.lock'), $lockData);
@@ -283,8 +379,11 @@ class InstallerController extends Controller
             return response()->json([
                 'success' => true,
                 'message' => 'City Online AP has been installed successfully!',
+                'redirect_url' => url('/admin/login'),
+                'site_url' => url('/'),
+                'admin_email' => $validated['admin_email'],
             ]);
-        } catch (Exception $e) {
+        } catch (\Throwable $e) {
             return response()->json([
                 'success' => false,
                 'message' => 'Installation error: ' . $e->getMessage(),
@@ -299,17 +398,31 @@ class InstallerController extends Controller
             copy(base_path('.env.example'), $envPath);
         }
 
-        $envContent = file_get_contents($envPath);
+        $lines = file($envPath, FILE_IGNORE_NEW_LINES);
+        if ($lines === false) {
+            $lines = [];
+        }
 
-        foreach ($data as $key => $value) {
-            $pattern = "/^{$key}=.*/m";
-            if (preg_match($pattern, $envContent)) {
-                $envContent = preg_replace($pattern, "{$key}={$value}", $envContent);
-            } else {
-                $envContent .= "\n{$key}={$value}";
+        $updatedKeys = [];
+        foreach ($lines as $i => $line) {
+            $trimmed = trim($line);
+            if (empty($trimmed) || str_starts_with($trimmed, '#')) {
+                continue;
+            }
+            foreach ($data as $key => $value) {
+                if (str_starts_with($trimmed, $key . '=')) {
+                    $lines[$i] = "{$key}={$value}";
+                    $updatedKeys[$key] = true;
+                }
             }
         }
 
-        file_put_contents($envPath, $envContent);
+        foreach ($data as $key => $value) {
+            if (!isset($updatedKeys[$key])) {
+                $lines[] = "{$key}={$value}";
+            }
+        }
+
+        file_put_contents($envPath, implode("\n", $lines) . "\n");
     }
 }

@@ -22,7 +22,7 @@ return [
         'mysql' => [
             'driver' => 'mysql',
             'url' => env('DB_URL'),
-            'host' => env('DB_HOST', '127.0.0.1'),
+            'host' => env('DB_HOST', 'localhost'),
             'port' => env('DB_PORT', '3306'),
             'database' => env('DB_DATABASE', 'cityonline_db'),
             'username' => env('DB_USERNAME', 'root'),
@@ -36,7 +36,10 @@ return [
             'engine' => null,
             'options' => extension_loaded('pdo_mysql') ? array_filter([
                 PDO::MYSQL_ATTR_SSL_CA => env('MYSQL_ATTR_SSL_CA'),
-            ]) : [],
+                PDO::ATTR_TIMEOUT => 10,
+            ]) : [
+                PDO::ATTR_TIMEOUT => 10,
+            ],
         ],
 
     ],
