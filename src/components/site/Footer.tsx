@@ -15,7 +15,7 @@ export function Footer() {
 
   const addr1 = settings?.address_line1 || CONTACT.address[0] || "City Broadband Services";
   const addr2 = settings?.address_line2 || CONTACT.address[1] || "#34-1-6, Temple Street, Opp. Joyalukas Jewellers";
-  const addrCity = settings?.address_city || CONTACT.address[2] || "Kakinada 533001, Andhra Pradesh";
+  const addrCity = settings?.address_city || CONTACT.address[2] || "Peddapuram 533437, Andhra Pradesh";
 
   const template = settings?.footer_template || "modern-gradient";
 
@@ -28,7 +28,7 @@ export function Footer() {
         <div className="min-w-0">
           <Logo type="footer" surface className="max-h-8 max-w-[220px]" />
           <p className="mt-5 max-w-xs text-sm text-navy-foreground/75 leading-relaxed">
-            City Online AP Pvt Ltd — Kakinada's own fibre broadband for 10+ years. Our own network, our own local people.
+            City Online AP Pvt Ltd — Peddapuram's own fibre broadband for 10+ years. Our own network, our own local people.
           </p>
 
           <div className="mt-4 flex items-center gap-2 text-xs font-semibold text-accent">

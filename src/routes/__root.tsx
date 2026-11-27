@@ -88,8 +88,8 @@ export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()(
     meta: [
       { charSet: "utf-8" },
       { name: "viewport", content: "width=device-width, initial-scale=1" },
-      { title: "City Online AP — Fibre Broadband in Kakinada" },
-      { name: "description", content: "Unlimited fibre broadband in Kakinada from City Online AP Pvt Ltd." },
+      { title: "City Online AP — Fibre Broadband in Peddapuram & Surroundings" },
+      { name: "description", content: "Unlimited fibre broadband in Peddapuram and surrounding areas from City Online AP Pvt Ltd." },
       { name: "author", content: "City Online AP Pvt Ltd" },
       { name: "theme-color", content: "#073B91" },
       { property: "og:site_name", content: "City Online AP" },

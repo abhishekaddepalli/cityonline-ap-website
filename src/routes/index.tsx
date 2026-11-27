@@ -13,8 +13,8 @@ import { seo } from "@/lib/seo";
 
 export const Route = createFileRoute("/")({
   head: () => {
-    const h = seo("Unlimited Fibre Broadband in Kakinada", "One connection, the whole house. Unlimited fibre broadband in Kakinada from ₹590/month incl. GST, with the same upload and download speed.", "/");
-    h.meta[0] = { title: "City Online AP — Unlimited Fibre Broadband in Kakinada" };
+    const h = seo("Unlimited Fibre Broadband in Peddapuram & Surroundings", "One connection, the whole house. Unlimited fibre broadband in Peddapuram from ₹590/month incl. GST, with the same upload and download speed.", "/");
+    h.meta[0] = { title: "City Online AP — Unlimited Fibre Broadband in Peddapuram & Surroundings" };
     return h;
   },
   component: Home,
@@ -42,7 +42,7 @@ function Hero() {
           src={heroBg || family}
           srcSet={heroBg ? undefined : `${familyMobile} 800w, ${family} 1600w`}
           sizes="100vw"
-          alt="A family in Kakinada enjoying fibre internet together on a laptop at home"
+          alt="A family in Peddapuram enjoying fibre internet together on a laptop at home"
           width={1600}
           height={1008}
           fetchPriority="high"

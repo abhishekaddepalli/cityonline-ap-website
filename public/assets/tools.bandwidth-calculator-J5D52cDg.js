@@ -1,0 +1,1 @@
+import{t as e}from"./ToolPage-BGPymLc9.js";import{V as t}from"./index-Dl1yAOIy.js";import{t as n}from"./NetTools-C3Aaw8bO.js";var r=t(),i=()=>(0,r.jsx)(e,{current:`/tools/bandwidth-calculator`,title:`Bandwidth Calculator`,sub:`Estimate how long a download will take at your internet speed.`,children:(0,r.jsx)(n,{})});export{i as component};

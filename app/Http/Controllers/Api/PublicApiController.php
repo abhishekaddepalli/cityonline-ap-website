@@ -109,10 +109,30 @@ class PublicApiController extends Controller
             'source' => 'website',
         ]);
 
+        // Build prefilled WhatsApp URL to configured enquiries number
+        $waNumber = Setting::get('whatsapp_enquiries_number', Setting::get('whatsapp_number', '919700928928'));
+        $cleanWa = preg_replace('/[^0-9]/', '', $waNumber);
+        $locText = $enquiry->locality ? "📍 Locality: {$enquiry->locality}\n" : "";
+        $planText = $enquiry->interested_plan ? "⚡ Plan: {$enquiry->interested_plan}\n" : "";
+        $waTemplate = Setting::get('whatsapp_enquiry_template');
+        if ($waTemplate) {
+            $waMsg = str_replace(
+                ['{name}', '{phone}', '{locality}', '{plan}'],
+                [$enquiry->customer_name, $enquiry->mobile_number, $enquiry->locality ?? 'Peddapuram & Surroundings', $enquiry->interested_plan ?? 'Standard'],
+                $waTemplate
+            );
+        } else {
+            $waMsg = "Hello City Online AP! New broadband connection enquiry from website:\n\n👤 Name: {$enquiry->customer_name}\n📱 Mobile: {$enquiry->mobile_number}\n{$locText}{$planText}";
+        }
+        $waUrl = "https://wa.me/{$cleanWa}?text=" . rawurlencode($waMsg);
+        $autoRedirect = Setting::get('whatsapp_auto_redirect', true);
+
         return response()->json([
             'success' => true,
-            'message' => 'Thank you! Your enquiry has been received. Our Kakinada team will contact you shortly.',
+            'message' => 'Thank you! Your enquiry has been received. Our Peddapuram team will contact you shortly.',
             'enquiry_id' => $enquiry->id,
+            'whatsapp_url' => $waUrl,
+            'whatsapp_auto_redirect' => (bool)$autoRedirect,
         ], 201);
     }
 

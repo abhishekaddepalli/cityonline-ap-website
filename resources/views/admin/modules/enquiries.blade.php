@@ -59,10 +59,22 @@
                                 @endif
                             </td>
                             <td class="py-3 px-4 font-mono font-semibold text-slate-700">
-                                <a href="tel:{{ $enq->mobile_number }}" class="hover:text-brand-orange">{{ $enq->mobile_number }}</a>
+                                @php
+                                    $cleanPhone = preg_replace('/[^0-9]/', '', $enq->mobile_number);
+                                    if (strlen($cleanPhone) === 10) {
+                                        $cleanPhone = '91' . $cleanPhone;
+                                    }
+                                    $waCustomerMsg = rawurlencode("Hello {$enq->customer_name}! We received your enquiry for City Online broadband in {$enq->locality}. How can we assist you with the connection?");
+                                @endphp
+                                <div class="flex items-center gap-2">
+                                    <a href="tel:{{ $enq->mobile_number }}" class="hover:text-brand-orange">{{ $enq->mobile_number }}</a>
+                                    <a href="https://wa.me/{{ $cleanPhone }}?text={{ $waCustomerMsg }}" target="_blank" rel="noopener noreferrer" class="p-1 rounded-md bg-emerald-50 text-emerald-600 hover:bg-emerald-100 transition" title="Chat on WhatsApp">
+                                        <svg class="w-3.5 h-3.5 fill-current" viewBox="0 0 24 24"><path d="M12.04 2c-5.46 0-9.91 4.45-9.91 9.91 0 1.75.46 3.45 1.32 4.95L2.05 22l5.25-1.38c1.45.79 3.08 1.21 4.74 1.21 5.46 0 9.91-4.45 9.91-9.91 0-2.65-1.03-5.14-2.9-7.01A9.816 9.816 0 0012.04 2m.01 1.67c4.54 0 8.24 3.7 8.24 8.24 0 2.2-.86 4.28-2.42 5.83a8.176 8.176 0 01-5.82 2.41c-1.47 0-2.92-.39-4.18-1.15l-.3-.18-3.11.82.83-3.04-.2-.31a8.18 8.18 0 01-1.26-4.38c0-4.54 3.7-8.24 8.22-8.24m4.52 11.64c-.25-.13-1.47-.72-1.7-.81-.23-.08-.39-.13-.56.13-.17.25-.64.81-.79.97-.14.17-.29.19-.54.06-.25-.13-1.06-.39-2.02-1.24-.74-.66-1.24-1.48-1.39-1.73-.14-.25-.02-.39.11-.51.11-.11.25-.29.37-.43.13-.15.17-.25.25-.42.08-.17.04-.31-.02-.44-.06-.13-.56-1.35-.77-1.85-.2-.48-.41-.42-.56-.43h-.48c-.17 0-.44.06-.67.31-.23.25-.88.86-.88 2.1 0 1.24.9 2.44 1.03 2.61.13.17 1.77 2.7 4.29 3.79.6.26 1.07.41 1.44.53.6.19 1.15.16 1.58.1.48-.07 1.47-.6 1.68-1.18.21-.58.21-1.07.15-1.18-.06-.1-.21-.17-.46-.29z"/></svg>
+                                    </a>
+                                </div>
                             </td>
                             <td class="py-3 px-4 text-slate-600">
-                                <span class="font-semibold text-brand-navy block">{{ $enq->locality ?? 'Kakinada' }}</span>
+                                <span class="font-semibold text-brand-navy block">{{ $enq->locality ?? 'Peddapuram & Surroundings' }}</span>
                                 <span class="text-[10px] text-slate-400 truncate max-w-xs block">{{ $enq->address }}</span>
                             </td>
                             <td class="py-3 px-4 font-semibold text-brand-orange">{{ $enq->interested_plan ?? 'General' }}</td>

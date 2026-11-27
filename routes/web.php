@@ -14,6 +14,7 @@ use App\Http\Controllers\Admin\HomepageSectionController;
 use App\Http\Controllers\Admin\InternetToolController;
 use App\Http\Controllers\Admin\LanguageController;
 use App\Http\Controllers\Admin\LinkController;
+use App\Http\Controllers\Admin\LocalityController;
 use App\Http\Controllers\Admin\MediaController;
 use App\Http\Controllers\Admin\NavigationController;
 use App\Http\Controllers\Admin\PageController;
@@ -90,11 +91,19 @@ Route::middleware('auth')->prefix('admin')->group(function () {
     Route::get('/popups', [\App\Http\Controllers\Admin\PopupController::class, 'index']);
     Route::put('/popups', [\App\Http\Controllers\Admin\PopupController::class, 'update']);
 
-    // 7. Broadband Plans
+    // Broadband Plans
     Route::get('/plans', [BroadbandPlanController::class, 'index']);
     Route::post('/plans', [BroadbandPlanController::class, 'store']);
     Route::put('/plans/{id}', [BroadbandPlanController::class, 'update']);
     Route::delete('/plans/{id}', [BroadbandPlanController::class, 'destroy']);
+
+    // Coverage & Localities Manager
+    Route::get('/localities', [LocalityController::class, 'index']);
+    Route::post('/localities', [LocalityController::class, 'store']);
+    Route::put('/localities/{id}', [LocalityController::class, 'update']);
+    Route::delete('/localities/{id}', [LocalityController::class, 'destroy']);
+    Route::post('/localities/{id}/toggle', [LocalityController::class, 'toggle']);
+    Route::post('/localities/load-peddapuram', [LocalityController::class, 'loadPeddapuram']);
 
     // 8. Internet Tools
     Route::get('/tools', [InternetToolController::class, 'index']);

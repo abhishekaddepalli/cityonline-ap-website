@@ -48,8 +48,8 @@ const QUICK_CHIPS = [
   { q: "What are your broadband plans?", te: "బ్రాడ్‌బ్యాండ్ ప్లాన్లు ఏమిటి?" },
   { q: "How can I pay my bill?", te: "బిల్లు ఎలా చెల్లించాలి?" },
   { q: "My internet is not working", te: "ఇంటర్నెట్ పనిచేయడం లేదు" },
-  { q: "Check coverage in Kakinada", te: "కాకినాడలో కవరేజ్ చెక్ చేయండి" },
-  { q: "Temple street office location", te: "ఆఫీస్ ఎక్కడ ఉంది?" },
+  { q: "Check coverage in Peddapuram", te: "పెద్దాపురంలో కవరేజ్ చెక్ చేయండి" },
+  { q: "Peddapuram office location", te: "పెద్దాపురం ఆఫీస్ ఎక్కడ ఉంది?" },
 ];
 
 export function FloatingSupport({ open, onOpenChange }: { open: boolean; onOpenChange: (open: boolean) => void }) {
@@ -196,7 +196,7 @@ export function FloatingSupport({ open, onOpenChange }: { open: boolean; onOpenC
                     AI Powered
                   </span>
                 </div>
-                <p className="text-[11px] text-white/75 truncate">Instant 24/7 Kakinada broadband answers</p>
+                <p className="text-[11px] text-white/75 truncate">Instant 24/7 Peddapuram broadband answers</p>
               </div>
 
               <div className="flex shrink-0 rounded-full bg-white/10 p-0.5">

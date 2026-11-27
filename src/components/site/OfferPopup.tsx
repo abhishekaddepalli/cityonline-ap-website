@@ -11,8 +11,8 @@ export function OfferPopup() {
 
   const isEnabled = settings?.popup_enabled === "1" || settings?.popup_enabled === "true";
   const badge = settings?.popup_badge || "EXCLUSIVE DEAL";
-  const title = settings?.popup_title || "⚡ Upgrade to Kakinada's Own Fibre";
-  const subtitle = settings?.popup_subtitle || "Get 100 Mbps True Symmetric Internet with Unlimited Data, No FUP, and same-day installation across Kakinada!";
+  const title = settings?.popup_title || "⚡ Upgrade to Peddapuram's Own Fibre";
+  const subtitle = settings?.popup_subtitle || "Get 100 Mbps True Symmetric Internet with Unlimited Data, No FUP, and same-day installation across Peddapuram & surroundings!";
   const discountCode = settings?.popup_discount_code || "CITYFEST2026";
   const imageUrl = settings?.popup_image_url || "/images/fibre-technician-kakinada.jpg";
   const ctaLabel = settings?.popup_cta_label || "Get New Connection";

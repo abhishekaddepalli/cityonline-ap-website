@@ -458,7 +458,9 @@ class InstallerController extends Controller
             Setting::set('phone_support', $request->input('phone_support', '+91 8844 6668999'), 'contact', 'string', true);
             Setting::set('phone_office', $request->input('phone_office', ''), 'contact', 'string', true);
             Setting::set('whatsapp_number', preg_replace('/[^0-9]/', '', $request->input('whatsapp', '919700928928')), 'contact', 'string', true);
-            Setting::set('address_line1', $request->input('office_address', 'Temple Street, Kakinada'), 'company', 'string', true);
+            Setting::set('address_line1', $request->input('office_address', 'Main Road, Peddapuram'), 'company', 'string', true);
+            Setting::set('address_city', $request->input('office_city', 'Peddapuram 533437, Andhra Pradesh'), 'company', 'string', true);
+            Setting::set('target_location', 'Peddapuram & Surroundings', 'company', 'string', true);
             Setting::set('default_language', $request->input('default_language', 'en'), 'general', 'string', true);
             Setting::set('timezone', $request->input('timezone', 'Asia/Kolkata'), 'general', 'string', true);
             Setting::set('currency_symbol', $request->input('currency', '₹'), 'general', 'string', true);

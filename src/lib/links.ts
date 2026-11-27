@@ -34,15 +34,14 @@ export const CONTACT = {
   email: "citybroadbandkkd@gmail.com",
   address: [
     "City Broadband Services",
-    "#34-1-6, Temple Street,",
-    "Opp. Joyalukas Jewellers,",
-    "Kakinada 533001, Andhra Pradesh",
+    "Main Road, Near Kacheri Center / RTC Complex,",
+    "Peddapuram 533437, Andhra Pradesh",
   ],
 };
 
 export const PLANS = [
   { id: "standard", name: "Standard", speed: 60, price: "590", base: "₹500 + 18% GST", note: "Two or three phones and a TV", href: LINKS.plan.standard, popular: false },
-  { id: "premium", name: "Premium", speed: 100, price: "767", base: "₹650 + 18% GST", note: "Most homes in Kakinada pick this", href: LINKS.plan.premium, popular: true },
+  { id: "premium", name: "Premium", speed: 100, price: "767", base: "₹650 + 18% GST", note: "Most homes in Peddapuram pick this", href: LINKS.plan.premium, popular: true },
   { id: "ultra", name: "Ultra", speed: 150, price: "1,180", base: "₹1,000 + 18% GST", note: "Work from home, big household", href: LINKS.plan.ultra, popular: false },
 ] as const;
 

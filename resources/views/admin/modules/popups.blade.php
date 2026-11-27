@@ -118,7 +118,7 @@
 
             <div>
                 <label class="block font-bold text-slate-600 uppercase mb-1">Headline Title *</label>
-                <input type="text" name="popup_title" value="{{ $popupTitle }}" placeholder="e.g. ⚡ Upgrade to Kakinada's Own Fibre" class="w-full px-3 py-2 rounded-xl border border-slate-300 text-xs focus:border-brand-blue outline-none font-extrabold text-slate-800">
+                <input type="text" name="popup_title" value="{{ $popupTitle }}" placeholder="e.g. ⚡ Upgrade to Peddapuram's Own Fibre" class="w-full px-3 py-2 rounded-xl border border-slate-300 text-xs focus:border-brand-blue outline-none font-extrabold text-slate-800">
             </div>
 
             <div>

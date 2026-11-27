@@ -1,0 +1,1 @@
+import{t as e}from"./ToolPage-BGPymLc9.js";import{V as t}from"./index-Dl1yAOIy.js";import{a as n}from"./NetTools-C3Aaw8bO.js";var r=t(),i=()=>(0,r.jsx)(e,{current:`/tools/ping-test`,title:`Ping & Latency Test`,sub:`Measure approximate request latency from your browser, with average, minimum and maximum.`,children:(0,r.jsx)(n,{})});export{i as component};

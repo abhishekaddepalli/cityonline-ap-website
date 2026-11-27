@@ -141,8 +141,8 @@
                     @if($sec->section_key === 'about')
                         @php
                             $stats = $content['stats'] ?? [
-                                ['number' => '10+', 'label' => 'years in Kakinada'],
-                                ['number' => '40+', 'label' => 'localities covered'],
+                                ['number' => '10+', 'label' => 'years in Peddapuram'],
+                                ['number' => '30+', 'label' => 'localities covered'],
                                 ['number' => '24 hrs', 'label' => 'fault response'],
                             ];
                         @endphp
@@ -156,7 +156,7 @@
                                     <label class="block font-bold text-slate-500 mb-1">Stat 1 Value</label>
                                     <input type="text" name="stat_1_num" value="{{ $stats[0]['number'] ?? '10+' }}" class="w-full px-2.5 py-1.5 rounded-lg border border-slate-300 font-bold text-brand-orange text-xs">
                                     <label class="block font-semibold text-slate-500 mt-2 mb-1">Stat 1 Label</label>
-                                    <input type="text" name="stat_1_lbl" value="{{ $stats[0]['label'] ?? 'years in Kakinada' }}" class="w-full px-2.5 py-1.5 rounded-lg border border-slate-300 text-xs">
+                                    <input type="text" name="stat_1_lbl" value="{{ $stats[0]['label'] ?? 'years in Peddapuram' }}" class="w-full px-2.5 py-1.5 rounded-lg border border-slate-300 text-xs">
                                 </div>
                                 <div class="bg-white p-3 rounded-xl border border-slate-200">
                                     <label class="block font-bold text-slate-500 mb-1">Stat 2 Value</label>

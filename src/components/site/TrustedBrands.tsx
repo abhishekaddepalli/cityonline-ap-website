@@ -19,7 +19,7 @@ export function TrustedBrands() {
             Trusted by Businesses, Backed by World-Class Tech
           </h2>
           <p className="mt-2 text-xs sm:text-sm text-muted-foreground">
-            Powering homes and institutions in Kakinada with carrier-grade optical hardware, high-availability routing, and trusted partners.
+            Powering homes and institutions in Peddapuram and surrounding areas with carrier-grade optical hardware, high-availability routing, and trusted partners.
           </p>
         </Reveal>
 

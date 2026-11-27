@@ -11,14 +11,14 @@ class LanguageController extends Controller
 {
     public function index()
     {
-        $heroBadgeEn = Setting::get('lang_hero_badge_en', 'Fibre broadband in Kakinada');
-        $heroBadgeTe = Setting::get('lang_hero_badge_te', 'కాకినాడలో ఫైబర్ బ్రాడ్‌బ్యాండ్');
+        $heroBadgeEn = Setting::get('lang_hero_badge_en', 'Fibre broadband in Peddapuram');
+        $heroBadgeTe = Setting::get('lang_hero_badge_te', 'పెద్దాపురంలో ఫైబర్ బ్రాడ్‌బ్యాండ్');
         $heroTitleAEn = Setting::get('lang_hero_title_a_en', 'One connection,');
         $heroTitleATe = Setting::get('lang_hero_title_a_te', 'ఒకే కనెక్షన్,');
         $heroTitleBEn = Setting::get('lang_hero_title_b_en', 'the whole house.');
         $heroTitleBTe = Setting::get('lang_hero_title_b_te', 'ఇల్లంతా ఇంటర్నెట్.');
-        $heroSubEn = Setting::get('lang_hero_sub_en', 'Unlimited, reliable and high-speed fibre broadband for your home and business in Kakinada.');
-        $heroSubTe = Setting::get('lang_hero_sub_te', 'కాకినాడలో మీ ఇల్లు మరియు వ్యాపారానికి అపరిమితమైన, నమ్మకమైన హై-స్పీడ్ ఫైబర్ బ్రాడ్‌బ్యాండ్.');
+        $heroSubEn = Setting::get('lang_hero_sub_en', 'Unlimited, reliable and high-speed fibre broadband for your home and business in Peddapuram and surrounding areas.');
+        $heroSubTe = Setting::get('lang_hero_sub_te', 'పెద్దాపురం మరియు పరిసర ప్రాంతాలలో మీ ఇల్లు మరియు వ్యాపారానికి అపరిమితమైన, నమ్మకమైన హై-స్పీడ్ ఫైబర్ బ్రాడ్‌బ్యాండ్.');
 
         return view('admin.modules.languages', compact(
             'heroBadgeEn', 'heroBadgeTe', 'heroTitleAEn', 'heroTitleATe', 'heroTitleBEn', 'heroTitleBTe', 'heroSubEn', 'heroSubTe'

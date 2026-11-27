@@ -17,8 +17,8 @@ export function Benefits() {
   const items = [
     { icon: InfinityIcon, t: "Unlimited Data", d: "No FUP on any plan — stream, study and work without limits." },
     { icon: ArrowUpDown, t: "Symmetric Speeds", d: "Same upload and download speeds for calls, cloud and gaming." },
-    { icon: Headphones, t: "Local Support", d: "A Kakinada team that answers the phone and comes to your street." },
-    { icon: MapPin, t: "Wide Coverage", d: "Fibre across 40+ localities in Kakinada." },
+    { icon: Headphones, t: "Local Support", d: "A Peddapuram team that answers the phone and comes to your street." },
+    { icon: MapPin, t: "Wide Coverage", d: "Fibre across Peddapuram, Samalkot and surrounding areas." },
   ];
   return (
     <section className="container-x py-16 sm:py-20">
@@ -104,14 +104,16 @@ export function PlansGrid({ showAll = true }: { showAll?: boolean }) {
 }
 
 export const AREAS = [
-  "Sarpavaram", "Ramanayyapeta", "Jagannaickpur", "Suryaraopeta", "Gandhinagar", "Bhanugudi",
-  "Madhavapatnam", "Vakalapudi", "Turangi", "Indrapalem", "Ramaraopeta", "Achampeta", "Valasapakala", "Temple Street",
+  "Peddapuram Town", "Samalkot", "Kacheri Center", "Main Road", "RTC Complex",
+  "Rayabhupalapatnam", "Pulimeru", "G. Ragampeta", "Vadlamuru", "Kandrakota",
+  "ADB Road", "Fort Area",
 ];
 
 export function CoverageChecker() {
   const { t } = usePrefs();
-  const { localities, submitEnquiry } = useCms();
+  const { localities, settings, submitEnquiry } = useCms();
   const allAreas = localities && localities.length > 0 ? localities : AREAS;
+  const targetRegion = settings?.target_location || "Peddapuram & Surroundings";
   const [q, setQ] = useState("");
   const [picked, setPicked] = useState<string | null>(null);
   const [phone, setPhone] = useState("");
@@ -119,6 +121,7 @@ export function CoverageChecker() {
   const [submitting, setSubmitting] = useState(false);
   const [submitted, setSubmitted] = useState(false);
   const [errorMsg, setErrorMsg] = useState("");
+  const [whatsappLeadUrl, setWhatsappLeadUrl] = useState<string>("");
 
   const suggestions = q.length > 0 ? allAreas.filter((a) => a.toLowerCase().includes(q.toLowerCase())).slice(0, 5) : [];
   const submit = (v: string) => {
@@ -137,18 +140,35 @@ export function CoverageChecker() {
     }
     setSubmitting(true);
     setErrorMsg("");
+
+    const chosenArea = picked || q || "Peddapuram";
+    const customerName = name.trim() || "Peddapuram Resident";
+    const customerPhone = phone.trim();
+
+    // 1. Submit lead to database
     const res = await submitEnquiry({
-      customer_name: name.trim() || "Kakinada Resident",
-      mobile_number: phone.trim(),
-      locality: picked || q,
+      customer_name: customerName,
+      mobile_number: customerPhone,
+      locality: chosenArea,
       enquiry_type: "coverage",
       notes: "Coverage availability enquiry from website",
     });
+
     setSubmitting(false);
-    if (res.success) {
-      setSubmitted(true);
-    } else {
-      setErrorMsg(res.message || "Failed to submit enquiry. Please call us.");
+
+    // 2. Generate WhatsApp lead URL to the configured WhatsApp number
+    const waNumber = settings?.whatsapp_enquiries_number || settings?.whatsapp_number || "919700928928";
+    const cleanWa = waNumber.replace(/\D/g, "");
+    const waText = `Hello City Online AP! I want to check broadband coverage / get a new connection in ${targetRegion}.\n\n👤 Name: ${customerName}\n📱 Mobile: ${customerPhone}\n📍 Locality: ${chosenArea}`;
+    const generatedWaUrl = (res as any)?.whatsapp_url || `https://wa.me/${cleanWa}?text=${encodeURIComponent(waText)}`;
+
+    setWhatsappLeadUrl(generatedWaUrl);
+    setSubmitted(true);
+
+    // 3. Auto-redirect to WhatsApp if enabled (default true)
+    const autoRedirect = (res as any)?.whatsapp_auto_redirect !== false && settings?.whatsapp_auto_redirect !== "0" && settings?.whatsapp_auto_redirect !== false;
+    if (autoRedirect && typeof window !== "undefined") {
+      window.open(generatedWaUrl, "_blank");
     }
   };
 
@@ -158,7 +178,7 @@ export function CoverageChecker() {
       <div className="relative grid gap-8 lg:grid-cols-[1.1fr_1fr] lg:items-center">
         <div className="min-w-0">
           <h2 className="text-3xl font-extrabold text-primary sm:text-4xl">{t("coverageTitle")}</h2>
-          <p className="mt-3 text-muted-foreground">We cover 40+ localities across Kakinada. Enter your locality and we'll help you send an enquiry.</p>
+          <p className="mt-3 text-muted-foreground">We cover Peddapuram, Samalkot and surrounding areas. Enter your locality and we'll help you send an enquiry.</p>
           <form className="relative mt-6" onSubmit={(e) => { e.preventDefault(); submit(q); }}>
             <label htmlFor="locality" className="sr-only">Your locality</label>
             <div className="flex flex-col gap-3 sm:flex-row">
@@ -168,7 +188,7 @@ export function CoverageChecker() {
                 {suggestions.length > 0 && !picked && (
                   <ul className="absolute inset-x-0 top-full z-10 mt-1 overflow-hidden rounded-xl border border-border bg-popover shadow-lift">
                     {suggestions.map((s) => (
-                      <li key={s}><button type="button" onClick={() => { setQ(s); submit(s); }} className="flex w-full items-center gap-2 px-4 py-2.5 text-left text-sm hover:bg-secondary"><MapPin className="h-4 w-4 text-accent" />{s}, Kakinada</button></li>
+                      <li key={s}><button type="button" onClick={() => { setQ(s); submit(s); }} className="flex w-full items-center gap-2 px-4 py-2.5 text-left text-sm hover:bg-secondary"><MapPin className="h-4 w-4 text-accent" />{s}</button></li>
                     ))}
                   </ul>
                 )}
@@ -187,15 +207,33 @@ export function CoverageChecker() {
             {picked ? (
               <motion.div key={picked} initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0 }}>
                 <MapPin className="h-8 w-8 text-accent" />
-                <h3 className="mt-3 text-xl font-bold text-primary">{picked}, Kakinada</h3>
+                <h3 className="mt-3 text-xl font-bold text-primary">{picked}</h3>
                 <p className="mt-2 text-sm text-secondary-foreground/80">
-                  We have high-density fibre coverage in {picked}. Enter your details below for instant verification by our local team:
+                  We have high-density fibre coverage in {picked}. Enter your details below to connect with our local Peddapuram team:
                 </p>
 
                 {submitted ? (
-                  <div className="mt-4 rounded-xl bg-card p-4 border border-emerald-200">
-                    <p className="font-bold text-emerald-700 text-sm">✓ Enquiry Sent Successfully!</p>
-                    <p className="text-xs text-muted-foreground mt-1">Our Kakinada branch has received your request. A technician will contact you on <strong>{phone}</strong> within 2 hours.</p>
+                  <div className="mt-4 rounded-xl bg-card p-4 border border-emerald-200 shadow-sm space-y-3">
+                    <div>
+                      <p className="font-bold text-emerald-700 text-sm flex items-center gap-1.5">
+                        <Check className="h-4 w-4 text-emerald-600" />
+                        <span>Enquiry Registered Successfully!</span>
+                      </p>
+                      <p className="text-xs text-muted-foreground mt-1">
+                        Our Peddapuram branch has received your request. A technician will contact you on <strong>{phone}</strong> within 2 hours.
+                      </p>
+                    </div>
+
+                    {whatsappLeadUrl && (
+                      <a
+                        href={whatsappLeadUrl}
+                        {...ext}
+                        className="inline-flex items-center justify-center gap-2 w-full rounded-xl bg-emerald-600 hover:bg-emerald-700 text-white font-bold py-2.5 px-4 text-xs shadow-md transition"
+                      >
+                        <MessageCircle className="h-4 w-4" />
+                        <span>Chat on WhatsApp with Technician Now</span>
+                      </a>
+                    )}
                   </div>
                 ) : (
                   <form onSubmit={handleQuickEnquiry} className="mt-4 space-y-2.5">
@@ -218,8 +256,9 @@ export function CoverageChecker() {
                     </div>
                     {errorMsg && <p className="text-xs text-red-500 font-semibold">{errorMsg}</p>}
                     <div className="flex flex-wrap items-center gap-2 pt-1">
-                      <button type="submit" disabled={submitting} className={btnClass("orange", "h-10 text-xs")}>
-                        {submitting ? "Sending..." : "Request Call Back"}
+                      <button type="submit" disabled={submitting} className={btnClass("orange", "h-10 text-xs flex items-center gap-1.5")}>
+                        <MessageCircle className="h-3.5 w-3.5" />
+                        <span>{submitting ? "Sending..." : "Request on WhatsApp & Phone"}</span>
                       </button>
                       <a href={LINKS.newConnection} {...ext} className={btnClass("outline", "h-10 text-xs")}>
                         Online Portal <ArrowRight className="h-3.5 w-3.5" />
@@ -238,7 +277,7 @@ export function CoverageChecker() {
             ) : (
               <motion.div key="empty" initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }} className="flex h-full flex-col justify-center">
                 <Network className="h-8 w-8 text-primary" />
-                <p className="mt-3 font-bold text-primary">Fibre across Kakinada</p>
+                <p className="mt-3 font-bold text-primary">Fibre across Peddapuram &amp; Surroundings</p>
                 <p className="mt-1 text-sm text-secondary-foreground/80">Choose or type your locality to see the next step. Final availability is always confirmed by City Online AP.</p>
               </motion.div>
             )}
@@ -272,7 +311,7 @@ export function SelfService() {
     { icon: PlugZap, t: "Get New Connection", d: "Book fibre for your home or office", href: LINKS.newConnection },
     { icon: WifiOff, t: "Internet Not Working?", d: "Fix it fast or reach our team", to: "/tools/wifi-troubleshooter" as const },
     { icon: Headphones, t: "Contact Support", d: "Phone, WhatsApp and email", to: "/contact" as const },
-    { icon: MapPin, t: "Check Coverage", d: "40+ localities in Kakinada", to: "/coverage" as const },
+    { icon: MapPin, t: "Check Coverage", d: "Localities in Peddapuram & surroundings", to: "/coverage" as const },
     { icon: Layers, t: "View Plans", d: "From ₹590/month incl. GST", to: "/plans" as const },
   ];
   return (
@@ -305,12 +344,13 @@ export function SelfService() {
 }
 
 export function AboutBlock({ withLink = true }: { withLink?: boolean }) {
-  const { sections } = useCms();
+  const { sections, settings } = useCms();
   const about = sections?.about;
+  const targetRegion = settings?.target_location || "Peddapuram & Surroundings";
 
   const defaultStats = [
-    { n: "10+", l: "years in Kakinada" },
-    { n: "40+", l: "localities covered" },
+    { n: "10+", l: "years in Peddapuram" },
+    { n: "30+", l: "localities covered" },
     { n: "24 hrs", l: "fault response" },
   ];
 
@@ -328,7 +368,7 @@ export function AboutBlock({ withLink = true }: { withLink?: boolean }) {
       <Reveal className="relative">
         <img
           src={imgSrc}
-          alt="A City Online technician running fibre above a Kakinada street"
+          alt={`A City Online technician running fibre above a street in ${targetRegion}`}
           loading="lazy"
           width={1024}
           height={576}
@@ -352,9 +392,9 @@ export function AboutBlock({ withLink = true }: { withLink?: boolean }) {
         <ul className="mt-6 grid gap-3 sm:grid-cols-2">
           {[
             { i: Network, t: "Company-owned fibre network" },
-            { i: Users, t: "Local Kakinada team" },
+            { i: Users, t: "Local Peddapuram team" },
             { i: Building2, t: "Homes and businesses" },
-            { i: LifeBuoy, t: "Office on Temple Street" },
+            { i: LifeBuoy, t: "Office in Peddapuram" },
           ].map((x) => (
             <li key={x.t} className="flex items-center gap-3 rounded-xl bg-secondary p-3 text-sm font-semibold text-secondary-foreground"><x.i className="h-5 w-5 shrink-0 text-accent" />{x.t}</li>
           ))}
@@ -375,7 +415,7 @@ export function SupportBlock() {
   ];
   return (
     <section className="container-x py-16 sm:py-20">
-      <SectionHeading eyebrow="Customer support" title="Real people in Kakinada, ready to help." sub="Faults are attended within 24 hours. Reach us the way that suits you." />
+      <SectionHeading eyebrow="Customer support" title="Real people in Peddapuram, ready to help." sub="Faults are attended within 24 hours. Reach us the way that suits you." />
       <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-5">
         {items.map((x, i) => {
           const cls = "group flex h-full flex-col rounded-2xl border border-border bg-card p-5 shadow-soft transition hover:-translate-y-1 hover:shadow-lift";

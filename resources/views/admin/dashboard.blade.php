@@ -140,7 +140,7 @@
                         <tr class="hover:bg-slate-50/70 transition">
                             <td class="py-3 px-4 font-semibold text-slate-800">{{ $enq->customer_name }}</td>
                             <td class="py-3 px-4 text-slate-600 font-mono">{{ $enq->mobile_number }}</td>
-                            <td class="py-3 px-4 text-slate-600">{{ $enq->locality ?? 'Kakinada' }}</td>
+                            <td class="py-3 px-4 text-slate-600">{{ $enq->locality ?? 'Peddapuram' }}</td>
                             <td class="py-3 px-4">
                                 <span class="px-2 py-0.5 rounded-full text-[10px] font-bold bg-blue-50 text-brand-blue">
                                     {{ ucwords(str_replace('_', ' ', $enq->enquiry_type)) }}

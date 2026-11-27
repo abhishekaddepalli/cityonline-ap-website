@@ -141,7 +141,7 @@ export function CmsProvider({ children }: { children: React.ReactNode }) {
               speed: Number(p.speed_mbps) || 0,
               price: formattedPrice,
               base: baseText,
-              note: p.note || p.description || (p.is_popular ? "Most popular choice in Kakinada" : "Reliable fibre broadband"),
+              note: p.note || p.description || (p.is_popular ? "Most popular choice in Peddapuram" : "Reliable fibre broadband"),
               href: p.cta_url || p.portal_url || (p.slug && (LINKS.plan as any)[p.slug]) || LINKS.newConnection,
               popular: Boolean(p.is_popular),
               features: Array.isArray(p.features) && p.features.length > 0 ? p.features : ["Unlimited data, no FUP", "Same upload & download speed", "Faults attended in 24 hours"],

@@ -80,7 +80,7 @@
             @csrf
             <div>
                 <label class="block font-bold text-slate-700 uppercase mb-1">Article Title</label>
-                <input type="text" name="title" required class="w-full px-3 py-2 rounded-xl border border-slate-300 text-xs focus:border-brand-blue outline-none" placeholder="e.g. City Online Upgrades Kakinada Core Fibre Ring">
+                <input type="text" name="title" required class="w-full px-3 py-2 rounded-xl border border-slate-300 text-xs focus:border-brand-blue outline-none" placeholder="e.g. City Online Upgrades Peddapuram Core Fibre Ring">
             </div>
 
             <div class="grid grid-cols-2 gap-3">

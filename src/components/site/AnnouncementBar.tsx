@@ -9,7 +9,7 @@ export function AnnouncementBar() {
 
   const isEnabled = settings?.announcement_enabled === "1" || settings?.announcement_enabled === "true";
   const badge = settings?.announcement_badge || "SPECIAL OFFER";
-  const text = settings?.announcement_text || "Get FREE dual-band Wi-Fi router + Zero installation fee on all 6-month plans in Kakinada!";
+  const text = settings?.announcement_text || "Get FREE dual-band Wi-Fi router + Zero installation fee on all 6-month plans in Peddapuram & surroundings!";
   const ctaLabel = settings?.announcement_cta_label || "Claim Now";
   const ctaUrl = settings?.announcement_cta_url || "https://customer.cityonlineap.com/book-connection";
   const style = settings?.announcement_style || "gradient-orange";

@@ -51,7 +51,7 @@ export function WifiTroubleshooter() {
       </ol>
       <div className="mt-8 rounded-2xl bg-secondary p-5">
         <p className="font-bold text-primary">Still not working?</p>
-        <p className="mt-1 text-sm text-secondary-foreground/80">Our Kakinada team attends faults within 24 hours.</p>
+        <p className="mt-1 text-sm text-secondary-foreground/80">Our Peddapuram team attends faults within 24 hours.</p>
         <div className="mt-4 flex flex-wrap gap-2">
           <a href={LINKS.whatsapp} {...ext} className={btnClass("orange")}><MessageCircle className="h-4 w-4" /> WhatsApp us</a>
           <a href={LINKS.tel.support} className={btnClass("outline")}><Phone className="h-4 w-4" /> Call support</a>

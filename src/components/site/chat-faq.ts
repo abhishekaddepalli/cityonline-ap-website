@@ -59,8 +59,8 @@ export const FAQS: Faq[] = [
     keys: ["area", "available", "coverage", "locality", "ప్రాంతం", "కవరేజ్"],
     q: { en: "Is broadband available in my area?", te: "నా ప్రాంతంలో బ్రాడ్‌బ్యాండ్ ఉందా?" },
     a: {
-      en: "We cover 40+ localities in Kakinada. Final availability depends on your exact address, so please send an enquiry and our team will confirm.",
-      te: "కాకినాడలో 40+ ప్రాంతాల్లో సేవ అందిస్తున్నాం. మీ చిరునామాను బట్టి లభ్యతను మా బృందం నిర్ధారిస్తుంది.",
+      en: "We cover Peddapuram, Samalkot and surrounding areas. Final availability depends on your exact address, so please send an enquiry and our team will confirm.",
+      te: "పెద్దాపురం, సామర్లకోట మరియు పరిసర ప్రాంతాలలో సేవ అందిస్తున్నాం. మీ చిరునామాను బట్టి లభ్యతను మా బృందం నిర్ధారిస్తుంది.",
     },
     links: [{ label: "Send area enquiry", href: LINKS.newConnection }],
   },

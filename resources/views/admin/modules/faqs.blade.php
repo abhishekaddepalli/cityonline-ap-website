@@ -95,7 +95,7 @@
             <div>
                 <div class="flex items-center justify-between mb-1">
                     <label class="font-bold text-slate-700 uppercase">AI System Persona &amp; ISP Knowledge Base Prompt</label>
-                    <span class="text-[10px] text-slate-400">Instructs the AI on plan pricing, Kakinada coverage, phone numbers, and WhatsApp links</span>
+                    <span class="text-[10px] text-slate-400">Instructs the AI on plan pricing, Peddapuram &amp; surroundings coverage, phone numbers, and WhatsApp links</span>
                 </div>
                 <textarea name="gemini_system_prompt" rows="8" class="w-full px-3 py-2 rounded-xl border border-slate-300 text-xs font-mono focus:border-brand-blue outline-none leading-relaxed">{{ $geminiSystemPrompt }}</textarea>
             </div>

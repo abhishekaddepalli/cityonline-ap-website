@@ -19,7 +19,7 @@ function Help() {
   const [open, setOpen] = useState<string | null>(FAQS[0]?.id ?? null);
   return (
     <>
-      <PageHero eyebrow="Support" title="How can we help?" sub="Faults are attended within 24 hours by our own team in Kakinada.">
+      <PageHero eyebrow="Support" title="How can we help?" sub="Faults are attended within 24 hours by our own team in Peddapuram & surroundings.">
         <div className="mt-6 flex flex-wrap gap-3">
           <Link to="/tools/wifi-troubleshooter" className={btnClass("orange")}>Internet not working?</Link>
           <a href={LINKS.help} {...ext} className={btnClass("ghostLight")}>Help on cityonlineap.com <ExternalLink className="h-4 w-4" /></a>

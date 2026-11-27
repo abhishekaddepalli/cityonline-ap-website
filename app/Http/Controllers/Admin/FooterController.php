@@ -14,7 +14,7 @@ class FooterController extends Controller
     {
         $address1 = Setting::get('address_line1', 'City Broadband Services');
         $address2 = Setting::get('address_line2', '#34-1-6, Temple Street, Opp. Joyalukas Jewellers');
-        $addressCity = Setting::get('address_city', 'Kakinada 533001, Andhra Pradesh');
+        $addressCity = Setting::get('address_city', 'Peddapuram 533437, Andhra Pradesh');
         $phoneNew = Setting::get('phone_new_connections', '+91 97009 28928');
         $phoneSupport = Setting::get('phone_support', '+91 8844 6668999');
         $phoneOffice = Setting::get('phone_office', '+91 8844 2383333');

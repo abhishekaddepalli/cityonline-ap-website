@@ -14,15 +14,15 @@ class PopupController extends Controller
     {
         $announcementEnabled = Setting::get('announcement_enabled', true);
         $announcementBadge = Setting::get('announcement_badge', 'FESTIVE OFFER');
-        $announcementText = Setting::get('announcement_text', 'Get FREE dual-band Wi-Fi router + Zero installation fee on all 6-month plans in Kakinada!');
+        $announcementText = Setting::get('announcement_text', 'Get FREE dual-band Wi-Fi router + Zero installation fee on all 6-month plans in Peddapuram & surroundings!');
         $announcementCtaLabel = Setting::get('announcement_cta_label', 'Claim Now');
         $announcementCtaUrl = Setting::get('announcement_cta_url', 'https://customer.cityonlineap.com/book-connection?src=announcement');
         $announcementStyle = Setting::get('announcement_style', 'gradient-orange');
 
         $popupEnabled = Setting::get('popup_enabled', true);
         $popupBadge = Setting::get('popup_badge', 'EXCLUSIVE DEAL');
-        $popupTitle = Setting::get('popup_title', '⚡ Upgrade to Kakinada\'s Own Fibre');
-        $popupSubtitle = Setting::get('popup_subtitle', 'Get 100 Mbps True Symmetric Internet with Unlimited Data, No FUP, and same-day installation across Kakinada!');
+        $popupTitle = Setting::get('popup_title', '⚡ Upgrade to Peddapuram\'s Own Fibre');
+        $popupSubtitle = Setting::get('popup_subtitle', 'Get 100 Mbps True Symmetric Internet with Unlimited Data, No FUP, and same-day installation across Peddapuram & surroundings!');
         $popupDiscountCode = Setting::get('popup_discount_code', 'CITYFEST2026');
         $popupImageUrl = Setting::get('popup_image_url', '/images/fibre-technician-kakinada.jpg');
         $popupCtaLabel = Setting::get('popup_cta_label', 'Get New Connection');

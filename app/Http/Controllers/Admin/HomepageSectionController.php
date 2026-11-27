@@ -78,7 +78,7 @@ class HomepageSectionController extends Controller
         if ($section->section_key === 'about') {
             $stats = [];
             if ($request->filled('stat_1_num')) {
-                $stats[] = ['number' => $request->input('stat_1_num'), 'label' => $request->input('stat_1_lbl', 'years in Kakinada')];
+                $stats[] = ['number' => $request->input('stat_1_num'), 'label' => $request->input('stat_1_lbl', 'years in Peddapuram')];
             }
             if ($request->filled('stat_2_num')) {
                 $stats[] = ['number' => $request->input('stat_2_num'), 'label' => $request->input('stat_2_lbl', 'localities covered')];

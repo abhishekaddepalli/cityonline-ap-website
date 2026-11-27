@@ -6,10 +6,10 @@ import { LINKS, ext } from "@/lib/links";
 import { seo } from "@/lib/seo";
 
 export const Route = createFileRoute("/about")({
-  head: () => seo("About City Online AP", "Kakinada's own fibre broadband for 10+ years. Our own network and our own local team — no franchise in between.", "/about"),
+  head: () => seo("About City Online AP", "Peddapuram's own fibre broadband for 10+ years. Our own network and our own local team — no franchise in between.", "/about"),
   component: () => (
     <>
-      <PageHero eyebrow="About us" title="Kakinada's own fibre broadband" sub="City Online AP Pvt Ltd has served homes and businesses in Kakinada for over 10 years, on a network we built and look after ourselves." />
+      <PageHero eyebrow="About us" title="Peddapuram's own fibre broadband" sub="City Online AP Pvt Ltd has served homes and businesses in Peddapuram and surrounding areas for over 10 years, on a network we built and look after ourselves." />
       <AboutBlock withLink={false} />
       <section className="bg-secondary/50 py-4"><Benefits /></section>
       <section className="container-x py-16 text-center">

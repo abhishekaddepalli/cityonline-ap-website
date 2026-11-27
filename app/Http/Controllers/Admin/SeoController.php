@@ -12,8 +12,8 @@ class SeoController extends Controller
 {
     public function index()
     {
-        $siteTitle = Setting::get('site_title', 'City Online AP — Unlimited Fibre Broadband in Kakinada');
-        $siteDesc = Setting::get('site_description', 'Unlimited high-speed symmetric fibre broadband in Kakinada from ₹590/month incl. GST with local customer support.');
+        $siteTitle = Setting::get('site_title', 'City Online AP — Unlimited Fibre Broadband in Peddapuram & Surroundings');
+        $siteDesc = Setting::get('site_description', 'Unlimited high-speed symmetric fibre broadband in Peddapuram and surrounding areas from ₹590/month incl. GST with local customer support.');
         $canonicalBase = Setting::get('canonical_base', 'https://cityonlineap.com');
         $googleVerification = Setting::get('google_verification', '');
         $robotsTxt = Setting::get('robots_txt', "User-agent: *\nAllow: /\nDisallow: /admin/\nDisallow: /install/\nSitemap: https://cityonlineap.com/sitemap.xml");
