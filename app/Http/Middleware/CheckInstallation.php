@@ -24,7 +24,8 @@ class CheckInstallation
 
         // If installed, permanently lock installer routes
         if ($isInstalled && $isInstallRoute) {
-            return redirect('/admin')->with('info', 'City Online AP is already installed and locked for security.');
+            $dest = auth()->check() ? '/admin' : '/admin/login';
+            return redirect($dest)->with('info', 'City Online AP is already installed and locked for security.');
         }
 
         return $next($request);

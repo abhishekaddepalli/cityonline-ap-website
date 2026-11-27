@@ -25,8 +25,11 @@ class DashboardController extends Controller
         $recentActivities = ActivityLog::with('user')->latest()->take(8)->get();
 
         // Monthly Enquiry Trends (last 6 months)
+        $isSqlite = DB::connection()->getDriverName() === 'sqlite';
+        $monthExpr = $isSqlite ? "strftime('%Y-%m', created_at)" : "DATE_FORMAT(created_at, '%Y-%m')";
+
         $monthlyEnquiries = Enquiry::select(
-            DB::raw("strftime('%Y-%m', created_at) as month"),
+            DB::raw("{$monthExpr} as month"),
             DB::raw("count(*) as total")
         )
         ->groupBy('month')

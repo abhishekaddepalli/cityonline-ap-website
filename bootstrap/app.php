@@ -13,6 +13,7 @@ return Application::configure(basePath: dirname(__DIR__))
     )
     ->withMiddleware(function (Middleware $middleware): void {
         $middleware->append(\App\Http\Middleware\CheckInstallation::class);
+        $middleware->redirectGuestsTo('/admin/login');
         $middleware->validateCsrfTokens(except: [
             'api/*',
             'install/*',
