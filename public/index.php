@@ -14,6 +14,27 @@ if (!file_exists($appPath . '/vendor/autoload.php')) {
     }
 }
 
+// Auto-bootstrap environment on fresh cPanel deployment (Zero CLI / Terminal needed)
+$envPath = $appPath . '/.env';
+if (!file_exists($envPath) && file_exists($appPath . '/.env.example')) {
+    @copy($appPath . '/.env.example', $envPath);
+}
+
+// Auto-ensure required storage directories exist
+$storageDirs = [
+    $appPath . '/storage/framework/cache/data',
+    $appPath . '/storage/framework/sessions',
+    $appPath . '/storage/framework/views',
+    $appPath . '/storage/logs',
+    $appPath . '/storage/app/public',
+    $appPath . '/bootstrap/cache',
+];
+foreach ($storageDirs as $dir) {
+    if (!is_dir($dir)) {
+        @mkdir($dir, 0775, true);
+    }
+}
+
 // Check if maintenance mode is active
 if (file_exists($maintenance = $appPath . '/storage/framework/maintenance.php')) {
     require $maintenance;
