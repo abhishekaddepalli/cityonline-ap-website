@@ -1,14 +1,32 @@
 import type { ReactNode } from "react";
 import { cn } from "@/lib/utils";
 import { ext } from "@/lib/links";
+import { useCms } from "@/lib/cms";
 import logo from "@/assets/city-online-logo.png.asset.json";
 
-export function Logo({ className, surface = false }: { className?: string; surface?: boolean }) {
+export function Logo({ className, surface = false, type = "header" }: { className?: string; surface?: boolean; type?: "header" | "footer" }) {
+  const { settings } = useCms();
+  const custom = type === "footer" ? settings?.footer_logo : settings?.header_logo;
+  const defaultFallback = logo.url || "/__l5e/assets-v1/9f8be65f-5299-4384-8c94-43db0ccd1033/city-online-logo.png";
+  const logoSrc = custom || defaultFallback;
+
   const img = (
-    <img src={logo.url} alt="City Online AP Pvt. Ltd." width={423} height={54} decoding="async" className={cn("h-auto max-w-full w-auto", className)} />
+    <img
+      src={logoSrc}
+      alt="City Online AP Pvt. Ltd."
+      width={423}
+      height={54}
+      decoding="async"
+      onError={(e) => {
+        if (e.currentTarget.src !== window.location.origin + defaultFallback) {
+          e.currentTarget.src = defaultFallback;
+        }
+      }}
+      className={cn("h-auto max-w-full w-auto object-contain", className)}
+    />
   );
   // The logo artwork is dark blue; on dark surfaces it sits on a light plate so it stays legible.
-  return surface ? <span className="inline-flex rounded-xl bg-logo-surface px-3 py-2">{img}</span> : img;
+  return surface ? <span className="inline-flex rounded-xl bg-logo-surface px-3 py-2 shadow-xs">{img}</span> : img;
 }
 
 export function Reveal({ children, className }: { children: ReactNode; delay?: number; className?: string }) {

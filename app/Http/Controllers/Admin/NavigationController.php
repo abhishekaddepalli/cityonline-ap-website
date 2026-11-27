@@ -6,14 +6,56 @@ use App\Http\Controllers\Controller;
 use App\Models\ActivityLog;
 use App\Models\NavigationItem;
 use App\Models\NavigationMenu;
+use App\Models\Setting;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\File;
+use Illuminate\Support\Str;
 
 class NavigationController extends Controller
 {
     public function index()
     {
         $menus = NavigationMenu::with('items')->get();
-        return view('admin.modules.navigation', compact('menus'));
+        $headerLogo = Setting::get('header_logo', '/__l5e/assets-v1/9f8be65f-5299-4384-8c94-43db0ccd1033/city-online-logo.png');
+        $headerTemplate = Setting::get('header_template', 'modern-glass');
+        $headerGlow = Setting::get('enable_header_glow', true);
+
+        return view('admin.modules.navigation', compact('menus', 'headerLogo', 'headerTemplate', 'headerGlow'));
+    }
+
+    public function updateSettings(Request $request)
+    {
+        $request->validate([
+            'header_logo' => 'nullable|string|max:500',
+            'header_logo_file' => 'nullable|file|mimes:jpeg,png,jpg,webp,svg,gif|max:5120',
+            'header_template' => 'required|in:modern-glass,floating-island,classic-solid',
+            'enable_header_glow' => 'nullable|boolean',
+        ]);
+
+        $logoUrl = $request->input('header_logo');
+
+        if ($request->hasFile('header_logo_file')) {
+            $file = $request->file('header_logo_file');
+            $uploadDir = public_path('uploads/logos');
+            if (!File::isDirectory($uploadDir)) {
+                File::makeDirectory($uploadDir, 0755, true, true);
+            }
+
+            $filename = 'header_logo_' . time() . '.' . $file->getClientOriginalExtension();
+            $file->move($uploadDir, $filename);
+            $logoUrl = '/uploads/logos/' . $filename;
+        }
+
+        if ($logoUrl) {
+            Setting::set('header_logo', $logoUrl, 'branding', 'string', true);
+        }
+
+        Setting::set('header_template', $request->input('header_template', 'modern-glass'), 'branding', 'string', true);
+        Setting::set('enable_header_glow', $request->boolean('enable_header_glow'), 'branding', 'boolean', true);
+
+        ActivityLog::log('updated', 'navigation', 'Updated Header Logo and Header layout template.');
+
+        return redirect('/admin/header')->with('success', 'Header logo and template styling updated successfully.');
     }
 
     public function storeItem(Request $request)

@@ -6,6 +6,7 @@ use App\Http\Controllers\Controller;
 use App\Models\ActivityLog;
 use App\Models\Setting;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\File;
 
 class FooterController extends Controller
 {
@@ -20,9 +21,15 @@ class FooterController extends Controller
         $email = Setting::get('email_support', 'citybroadbandkkd@gmail.com');
         $whatsapp = Setting::get('whatsapp_number', '919700928928');
         $copyright = Setting::get('copyright_text', '© ' . date('Y') . ' City Online AP Pvt Ltd. All rights reserved.');
+        
+        $footerLogo = Setting::get('footer_logo', '/__l5e/assets-v1/9f8be65f-5299-4384-8c94-43db0ccd1033/city-online-logo.png');
+        $footerTemplate = Setting::get('footer_template', 'modern-gradient');
+        $devCreditText = Setting::get('developer_credit_text', 'Infiniforge Technologies');
+        $devCreditUrl = Setting::get('developer_credit_url', 'https://infiniforge.cloud');
 
         return view('admin.modules.footer', compact(
-            'address1', 'address2', 'addressCity', 'phoneNew', 'phoneSupport', 'phoneOffice', 'email', 'whatsapp', 'copyright'
+            'address1', 'address2', 'addressCity', 'phoneNew', 'phoneSupport', 'phoneOffice', 'email', 'whatsapp', 'copyright',
+            'footerLogo', 'footerTemplate', 'devCreditText', 'devCreditUrl'
         ));
     }
 
@@ -38,14 +45,48 @@ class FooterController extends Controller
             'email_support' => 'required|email',
             'whatsapp_number' => 'required|string',
             'copyright_text' => 'required|string',
+            'footer_logo' => 'nullable|string|max:500',
+            'footer_logo_file' => 'nullable|file|mimes:jpeg,png,jpg,webp,svg,gif|max:5120',
+            'footer_template' => 'required|in:modern-gradient,card-grid,minimal-clean',
+            'developer_credit_text' => 'required|string|max:100',
+            'developer_credit_url' => 'required|url|max:255',
         ]);
 
-        foreach ($validated as $key => $val) {
-            Setting::set($key, $val, 'footer', 'string', true);
+        $footerLogoUrl = $request->input('footer_logo');
+
+        if ($request->hasFile('footer_logo_file')) {
+            $file = $request->file('footer_logo_file');
+            $uploadDir = public_path('uploads/logos');
+            if (!File::isDirectory($uploadDir)) {
+                File::makeDirectory($uploadDir, 0755, true, true);
+            }
+
+            $filename = 'footer_logo_' . time() . '.' . $file->getClientOriginalExtension();
+            $file->move($uploadDir, $filename);
+            $footerLogoUrl = '/uploads/logos/' . $filename;
         }
 
-        ActivityLog::log('updated', 'footer', 'Updated website footer and official contact information.');
+        if ($footerLogoUrl) {
+            Setting::set('footer_logo', $footerLogoUrl, 'branding', 'string', true);
+        }
 
-        return redirect('/admin/footer')->with('success', 'Footer contact details and links saved successfully.');
+        Setting::set('footer_template', $validated['footer_template'], 'branding', 'string', true);
+        Setting::set('developer_credit_text', $validated['developer_credit_text'], 'branding', 'string', true);
+        Setting::set('developer_credit_url', $validated['developer_credit_url'], 'branding', 'string', true);
+
+        // Core address and contact info
+        Setting::set('address_line1', $validated['address_line1'], 'footer', 'string', true);
+        Setting::set('address_line2', $validated['address_line2'], 'footer', 'string', true);
+        Setting::set('address_city', $validated['address_city'], 'footer', 'string', true);
+        Setting::set('phone_new_connections', $validated['phone_new_connections'], 'footer', 'string', true);
+        Setting::set('phone_support', $validated['phone_support'], 'footer', 'string', true);
+        Setting::set('phone_office', $validated['phone_office'] ?? '', 'footer', 'string', true);
+        Setting::set('email_support', $validated['email_support'], 'footer', 'string', true);
+        Setting::set('whatsapp_number', $validated['whatsapp_number'], 'footer', 'string', true);
+        Setting::set('copyright_text', $validated['copyright_text'], 'footer', 'string', true);
+
+        ActivityLog::log('updated', 'footer', 'Updated website footer logo, template, Infiniforge credit link, and contact info.');
+
+        return redirect('/admin/footer')->with('success', 'Footer settings, logo, Infiniforge link, and contact details updated successfully.');
     }
 }

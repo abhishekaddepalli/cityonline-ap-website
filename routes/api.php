@@ -14,4 +14,5 @@ Route::prefix('v1')->group(function () {
     // Public Form Intakes
     Route::post('/enquiries', [PublicApiController::class, 'submitEnquiry']);
     Route::post('/support', [PublicApiController::class, 'submitSupportTicket']);
+    Route::post('/chat', [\App\Http\Controllers\Api\ChatController::class, 'handleChat']);
 });

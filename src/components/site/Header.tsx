@@ -4,6 +4,7 @@ import { ChevronDown, CreditCard, Menu, Moon, Sun, X, Home, Layers, Wrench, Head
 import { useEffect, useRef, useState, type ReactNode } from "react";
 import { LINKS, ext } from "@/lib/links";
 import { usePrefs } from "@/lib/prefs";
+import { useCms } from "@/lib/cms";
 import { cn } from "@/lib/utils";
 import { Logo } from "./primitives";
 import { SUPPORT_EXTERNAL, SUPPORT_INTERNAL, TOOLS } from "./nav-data";
@@ -92,8 +93,13 @@ function MenuItem({ icon: Icon, label, desc }: { icon: React.ComponentType<{ cla
 
 export function Header() {
   const { t } = usePrefs();
+  const { settings } = useCms();
   const [open, setOpen] = useState(false);
   const [scrolled, setScrolled] = useState(false);
+
+  const template = settings?.header_template || "modern-glass";
+  const glow = settings?.enable_header_glow === "1" || settings?.enable_header_glow === "true";
+
   useEffect(() => {
     const f = () => setScrolled(window.scrollY > 8);
     f();
@@ -105,18 +111,38 @@ export function Header() {
     return () => { document.body.style.overflow = ""; };
   }, [open]);
 
+  const isIsland = template === "floating-island";
+  const isSolid = template === "classic-solid";
+
   return (
     <>
       <header
         className={cn(
-          "sticky top-0 z-40 border-b transition-all",
-          scrolled ? "border-border bg-background/90 shadow-soft backdrop-blur-lg" : "border-transparent bg-background",
+          "z-40 transition-all duration-300",
+          isIsland
+            ? "sticky top-2 sm:top-3 px-3 sm:px-6"
+            : isSolid
+              ? "sticky top-0 border-b border-border bg-background shadow-xs"
+              : cn(
+                  "sticky top-0 border-b backdrop-blur-md transition-all",
+                  scrolled
+                    ? "border-border/80 bg-background/90 shadow-soft"
+                    : "border-border/30 bg-background/70",
+                ),
+          glow && "hover:border-accent/40",
         )}
       >
-        <div className="container-x grid h-16 grid-cols-[minmax(0,1fr)_auto] items-center gap-3 xl:flex xl:h-20 xl:justify-between">
+        <div
+          className={cn(
+            "grid h-16 grid-cols-[minmax(0,1fr)_auto] items-center gap-3 xl:flex xl:h-20 xl:justify-between transition-all",
+            isIsland
+              ? "container-x mx-auto rounded-2xl border border-border/70 bg-background/95 px-4 shadow-lift backdrop-blur-lg sm:px-6"
+              : "container-x",
+          )}
+        >
           <Link to="/" className="min-w-0" aria-label="City Online AP home">
             <span className="inline-flex max-w-full rounded-lg dark:bg-logo-surface dark:px-2 dark:py-1">
-              <Logo className="max-h-7 max-w-full sm:max-h-9 sm:max-w-none xl:max-h-10" />
+              <Logo type="header" className="h-auto w-auto max-h-7 max-w-full sm:max-h-9 sm:max-w-none xl:max-h-10" />
             </span>
           </Link>
           <nav aria-label="Main" className="hidden items-center gap-1 xl:flex">

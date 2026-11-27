@@ -77,6 +77,7 @@ Route::middleware('auth')->prefix('admin')->group(function () {
 
     // 5. Header & Navigation
     Route::get('/header', [NavigationController::class, 'index']);
+    Route::put('/header/settings', [NavigationController::class, 'updateSettings']);
     Route::post('/navigation/items', [NavigationController::class, 'storeItem']);
     Route::put('/navigation/items/{id}', [NavigationController::class, 'updateItem']);
     Route::delete('/navigation/items/{id}', [NavigationController::class, 'destroyItem']);
@@ -84,6 +85,10 @@ Route::middleware('auth')->prefix('admin')->group(function () {
     // 6. Footer Manager
     Route::get('/footer', [FooterController::class, 'index']);
     Route::put('/footer', [FooterController::class, 'update']);
+
+    // Announcements & Special Offers Popups
+    Route::get('/popups', [\App\Http\Controllers\Admin\PopupController::class, 'index']);
+    Route::put('/popups', [\App\Http\Controllers\Admin\PopupController::class, 'update']);
 
     // 7. Broadband Plans
     Route::get('/plans', [BroadbandPlanController::class, 'index']);
@@ -113,8 +118,10 @@ Route::middleware('auth')->prefix('admin')->group(function () {
     Route::get('/support', [SupportTicketController::class, 'index']);
     Route::put('/support/{id}', [SupportTicketController::class, 'update']);
 
-    // 13. Chatbot / FAQ
+    // 13. Chatbot / FAQ & Gemini AI Settings
     Route::get('/faqs', [FaqController::class, 'index']);
+    Route::put('/faqs/ai-settings', [FaqController::class, 'updateAiSettings']);
+    Route::post('/faqs/test-chat', [FaqController::class, 'testChat']);
     Route::post('/faqs', [FaqController::class, 'store']);
     Route::put('/faqs/{id}', [FaqController::class, 'update']);
     Route::delete('/faqs/{id}', [FaqController::class, 'destroy']);

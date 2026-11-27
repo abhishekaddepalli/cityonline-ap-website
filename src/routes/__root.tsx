@@ -14,6 +14,8 @@ import { CmsProvider } from "@/lib/cms";
 import { Header, MobileBottomNav } from "@/components/site/Header";
 import { Footer } from "@/components/site/Footer";
 import { FloatingSupport } from "@/components/site/FloatingSupport";
+import { AnnouncementBar } from "@/components/site/AnnouncementBar";
+import { OfferPopup } from "@/components/site/OfferPopup";
 
 import appCss from "../styles.css?url";
 import { reportLovableError } from "../lib/lovable-error-reporting";
@@ -134,6 +136,7 @@ function RootComponent() {
       <PrefsProvider>
         <CmsProvider>
           <a href="#main" className="sr-only focus:not-sr-only focus:fixed focus:left-4 focus:top-4 focus:z-[60] focus:rounded-lg focus:bg-accent focus:px-4 focus:py-2 focus:text-accent-foreground">Skip to content</a>
+          <AnnouncementBar />
           <Header />
           <main id="main">
             {/* Required: nested routes render here. Removing <Outlet /> breaks all child routes. */}
@@ -142,6 +145,7 @@ function RootComponent() {
           <Footer />
           <MobileBottomNav onHelp={() => setHelpOpen((value) => !value)} />
           <FloatingSupport open={helpOpen} onOpenChange={setHelpOpen} />
+          <OfferPopup />
         </CmsProvider>
       </PrefsProvider>
     </QueryClientProvider>
