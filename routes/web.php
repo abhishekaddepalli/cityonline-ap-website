@@ -41,6 +41,7 @@ Route::prefix('install')->group(function () {
     Route::get('/', [InstallerController::class, 'index']);
     Route::post('/test-db', [InstallerController::class, 'testDatabase']);
     Route::post('/run', [InstallerController::class, 'install']);
+    Route::post('/step/{step}', [InstallerController::class, 'executeStep']);
 });
 
 // Admin Authentication

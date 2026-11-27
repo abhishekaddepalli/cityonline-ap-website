@@ -367,16 +367,46 @@
 
             <!-- Step 6: Installation Progress / Completion -->
             <div id="step-6" class="p-6 sm:p-10 hidden">
-                <div id="installing-spinner" class="text-center py-8">
-                    <div class="inline-block animate-spin rounded-full h-12 w-12 border-4 border-brand-orange border-t-transparent mb-4"></div>
-                    <h3 class="text-lg font-bold text-brand-navy">Installing City Online AP Website...</h3>
-                    <p class="text-sm text-slate-500 mt-1">Executing database migrations, seeding verified broadband plans, and creating your admin account.</p>
-                    
-                    <div class="mt-4">
-                        <span id="install-stage-msg" class="text-xs font-semibold text-brand-blue bg-blue-50 border border-blue-100 px-3 py-1.5 rounded-lg inline-flex items-center gap-2">
-                            <span class="w-2 h-2 rounded-full bg-brand-orange animate-ping"></span>
-                            Connecting to database...
-                        </span>
+                <div id="installing-spinner" class="py-6 max-w-lg mx-auto">
+                    <div class="text-center mb-6">
+                        <div class="inline-block animate-spin rounded-full h-10 w-10 border-4 border-brand-orange border-t-transparent mb-3"></div>
+                        <h3 class="text-lg font-bold text-brand-navy">Installing City Online AP Website...</h3>
+                        <p class="text-xs text-slate-500">Executing automated installation steps on your cPanel server</p>
+                    </div>
+
+                    <!-- Live Step-by-Step Progress Cards -->
+                    <div class="space-y-2.5 text-xs">
+                        <div id="item-config" class="flex items-center justify-between p-3 rounded-xl bg-slate-50 border border-slate-200 transition">
+                            <div class="flex items-center gap-2.5">
+                                <span class="status-icon w-5 h-5 rounded-full flex items-center justify-center bg-blue-100 text-brand-blue font-bold text-[10px]">1</span>
+                                <span class="font-medium text-slate-700">Environment & Database Connection</span>
+                            </div>
+                            <span class="status-label text-slate-400 font-semibold">Waiting</span>
+                        </div>
+
+                        <div id="item-migrate" class="flex items-center justify-between p-3 rounded-xl bg-slate-50 border border-slate-200 transition">
+                            <div class="flex items-center gap-2.5">
+                                <span class="status-icon w-5 h-5 rounded-full flex items-center justify-center bg-slate-200 text-slate-600 font-bold text-[10px]">2</span>
+                                <span class="font-medium text-slate-700">Database Schema & Table Creation</span>
+                            </div>
+                            <span class="status-label text-slate-400 font-semibold">Waiting</span>
+                        </div>
+
+                        <div id="item-seed" class="flex items-center justify-between p-3 rounded-xl bg-slate-50 border border-slate-200 transition">
+                            <div class="flex items-center gap-2.5">
+                                <span class="status-icon w-5 h-5 rounded-full flex items-center justify-center bg-slate-200 text-slate-600 font-bold text-[10px]">3</span>
+                                <span class="font-medium text-slate-700">Verified Broadband Plans & Admin Account</span>
+                            </div>
+                            <span class="status-label text-slate-400 font-semibold">Waiting</span>
+                        </div>
+
+                        <div id="item-finish" class="flex items-center justify-between p-3 rounded-xl bg-slate-50 border border-slate-200 transition">
+                            <div class="flex items-center gap-2.5">
+                                <span class="status-icon w-5 h-5 rounded-full flex items-center justify-center bg-slate-200 text-slate-600 font-bold text-[10px]">4</span>
+                                <span class="font-medium text-slate-700">Security Lock & Storage Initialization</span>
+                            </div>
+                            <span class="status-label text-slate-400 font-semibold">Waiting</span>
+                        </div>
                     </div>
                 </div>
 
@@ -548,26 +578,6 @@
             document.getElementById('install-complete').classList.add('hidden');
             document.getElementById('install-error').classList.add('hidden');
 
-            // Live stage feedback
-            const stages = [
-                'Connecting to MySQL database...',
-                'Verifying database permissions...',
-                'Executing database schema migrations...',
-                'Seeding broadband plans and localities...',
-                'Creating administrator account...',
-                'Securing installation and locking wizard...'
-            ];
-            let stageIdx = 0;
-            const stageEl = document.getElementById('install-stage-msg');
-            const stageTimer = setInterval(() => {
-                if (stageIdx < stages.length - 1) {
-                    stageIdx++;
-                    if (stageEl) {
-                        stageEl.innerHTML = '<span class="w-2 h-2 rounded-full bg-brand-orange animate-ping"></span> ' + stages[stageIdx];
-                    }
-                }
-            }, 3000);
-
             const conn = document.getElementById('db_connection').value;
             const originUrl = window.location.origin || document.getElementById('website_url').value;
 
@@ -597,32 +607,66 @@
                 currency: document.getElementById('currency').value,
             };
 
-            const abortController = new AbortController();
-            const timeout = setTimeout(() => abortController.abort(), 120000);
+            const updateItemUI = (id, status, text) => {
+                const row = document.getElementById(id);
+                if (!row) return;
+                const icon = row.querySelector('.status-icon');
+                const label = row.querySelector('.status-label');
+                if (status === 'running') {
+                    row.className = 'flex items-center justify-between p-3 rounded-xl bg-blue-50/70 border border-blue-200 transition';
+                    icon.className = 'status-icon w-5 h-5 rounded-full flex items-center justify-center bg-brand-orange text-white text-[10px] animate-spin border-2 border-white';
+                    icon.innerHTML = '⟳';
+                    label.className = 'status-label text-brand-orange font-bold';
+                    label.innerText = text || 'In Progress...';
+                } else if (status === 'done') {
+                    row.className = 'flex items-center justify-between p-3 rounded-xl bg-emerald-50/70 border border-emerald-200 transition';
+                    icon.className = 'status-icon w-5 h-5 rounded-full flex items-center justify-center bg-emerald-500 text-white font-bold text-[10px]';
+                    icon.innerHTML = '✓';
+                    label.className = 'status-label text-emerald-700 font-bold';
+                    label.innerText = text || 'Done';
+                } else if (status === 'error') {
+                    row.className = 'flex items-center justify-between p-3 rounded-xl bg-red-50/70 border border-red-200 transition';
+                    icon.className = 'status-icon w-5 h-5 rounded-full flex items-center justify-center bg-red-500 text-white font-bold text-[10px]';
+                    icon.innerHTML = '✗';
+                    label.className = 'status-label text-red-600 font-bold';
+                    label.innerText = text || 'Failed';
+                }
+            };
+
+            const steps = [
+                { id: 'item-config', step: 'config', name: 'Environment & Database Setup' },
+                { id: 'item-migrate', step: 'migrate', name: 'Database Migrations' },
+                { id: 'item-seed', step: 'seed', name: 'Seeding Plans & Admin' },
+                { id: 'item-finish', step: 'finish', name: 'Finalizing Installation' },
+            ];
 
             try {
-                const res = await fetch('/install/run', {
-                    method: 'POST',
-                    headers: { 'Content-Type': 'application/json', 'Accept': 'application/json' },
-                    body: JSON.stringify(payload),
-                    signal: abortController.signal
-                });
-                clearTimeout(timeout);
-                clearInterval(stageTimer);
+                for (const s of steps) {
+                    updateItemUI(s.id, 'running');
+                    const res = await fetch('/install/step/' + s.step, {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json', 'Accept': 'application/json' },
+                        body: JSON.stringify(payload)
+                    });
+                    const rawText = await res.text();
+                    let data;
+                    try {
+                        data = JSON.parse(rawText);
+                    } catch (pe) {
+                        const cleanErr = rawText.replace(/<[^>]*>?/gm, ' ').replace(/\s+/g, ' ').trim().substring(0, 250);
+                        throw new Error(cleanErr || 'Server returned invalid response');
+                    }
 
-                const rawText = await res.text();
-                let data;
-                try {
-                    data = JSON.parse(rawText);
-                } catch (pe) {
-                    const cleanErr = rawText.replace(/<[^>]*>?/gm, ' ').replace(/\s+/g, ' ').trim().substring(0, 300);
-                    throw new Error(cleanErr || 'Server returned non-JSON response (Status ' + res.status + ')');
+                    if (!res.ok || !data.success) {
+                        updateItemUI(s.id, 'error');
+                        throw new Error(data.message || ('Error during ' + s.name));
+                    }
+                    updateItemUI(s.id, 'done');
                 }
 
-                document.getElementById('installing-spinner').classList.add('hidden');
-
-                if (res.ok && data.success) {
-                    // Update completion view with actual URLs
+                // All 4 micro-steps completed successfully!
+                setTimeout(() => {
+                    document.getElementById('installing-spinner').classList.add('hidden');
                     const liveWebUrl = originUrl + '/';
                     const liveAdminUrl = originUrl + '/admin/login';
 
@@ -638,19 +682,11 @@
                     document.getElementById('btn-admin-login').href = liveAdminUrl;
 
                     document.getElementById('install-complete').classList.remove('hidden');
-                } else {
-                    document.getElementById('install-error').classList.remove('hidden');
-                    document.getElementById('install-error').innerText = data.message || 'Installation failed.';
-                    btn.disabled = false;
-                }
+                }, 400);
+
             } catch (err) {
-                clearTimeout(timeout);
-                clearInterval(stageTimer);
-                document.getElementById('installing-spinner').classList.add('hidden');
                 document.getElementById('install-error').classList.remove('hidden');
-                document.getElementById('install-error').innerText = err.name === 'AbortError'
-                    ? 'Installation timed out after 120 seconds. Please check your MySQL database connection or server resources.'
-                    : (err.message || 'A network error occurred while running the installation.');
+                document.getElementById('install-error').innerText = err.message || 'An error occurred during installation.';
                 btn.disabled = false;
             }
         }
