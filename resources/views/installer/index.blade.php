@@ -317,7 +317,7 @@
                         </div>
                     </div>
 
-                    <div class="grid sm:grid-cols-3 gap-3">
+                    <div class="grid sm:grid-cols-2 md:grid-cols-4 gap-3">
                         <div>
                             <label class="block text-xs font-bold text-slate-700 uppercase mb-1">New Connections</label>
                             <input type="text" id="phone_new" value="+91 97009 28928" class="w-full px-3 py-2.5 rounded-xl border border-slate-300 text-sm focus:border-brand-blue outline-none">
@@ -325,6 +325,10 @@
                         <div>
                             <label class="block text-xs font-bold text-slate-700 uppercase mb-1">Support Phone</label>
                             <input type="text" id="phone_support" value="+91 8844 6668999" class="w-full px-3 py-2.5 rounded-xl border border-slate-300 text-sm focus:border-brand-blue outline-none">
+                        </div>
+                        <div>
+                            <label class="block text-xs font-bold text-slate-700 uppercase mb-1">Office Landline</label>
+                            <input type="text" id="phone_office" value="+91 8844 2383333" class="w-full px-3 py-2.5 rounded-xl border border-slate-300 text-sm focus:border-brand-blue outline-none">
                         </div>
                         <div>
                             <label class="block text-xs font-bold text-slate-700 uppercase mb-1">WhatsApp</label>
@@ -571,41 +575,19 @@
 
         async function executeFinalInstallation() {
             const btn = document.getElementById('install-btn');
-            btn.disabled = true;
+            if (btn) btn.disabled = true;
 
             goToStep(6);
-            document.getElementById('installing-spinner').classList.remove('hidden');
-            document.getElementById('install-complete').classList.add('hidden');
-            document.getElementById('install-error').classList.add('hidden');
+            document.getElementById('installing-spinner')?.classList.remove('hidden');
+            document.getElementById('install-complete')?.classList.add('hidden');
+            document.getElementById('install-error')?.classList.add('hidden');
 
-            const conn = document.getElementById('db_connection').value;
-            const originUrl = window.location.origin || document.getElementById('website_url').value;
-
-            const payload = {
-                db_connection: conn,
-                db_host: document.getElementById('db_host').value,
-                db_port: document.getElementById('db_port').value,
-                db_database: conn === 'sqlite' ? document.getElementById('sqlite_database').value : document.getElementById('db_database').value,
-                db_username: document.getElementById('db_username').value,
-                db_password: document.getElementById('db_password').value,
-                admin_name: document.getElementById('admin_name').value,
-                admin_username: document.getElementById('admin_username').value,
-                admin_email: document.getElementById('admin_email').value,
-                admin_password: document.getElementById('admin_password').value,
-                admin_password_confirmation: document.getElementById('admin_password_confirmation').value,
-                company_name: document.getElementById('company_name').value,
-                website_name: document.getElementById('website_name').value,
-                website_url: originUrl,
-                company_email: document.getElementById('company_email').value,
-                phone_new: document.getElementById('phone_new').value,
-                phone_support: document.getElementById('phone_support').value,
-                phone_office: document.getElementById('phone_office').value,
-                whatsapp: document.getElementById('whatsapp').value,
-                office_address: document.getElementById('office_address').value,
-                default_language: document.getElementById('default_language').value,
-                timezone: document.getElementById('timezone').value,
-                currency: document.getElementById('currency').value,
+            const val = (id, def = '') => {
+                const el = document.getElementById(id);
+                return (el && el.value !== undefined) ? el.value : def;
             };
+
+            const originUrl = window.location.origin || val('website_url', 'https://cityonlineap.com');
 
             const updateItemUI = (id, status, text) => {
                 const row = document.getElementById(id);
@@ -614,22 +596,34 @@
                 const label = row.querySelector('.status-label');
                 if (status === 'running') {
                     row.className = 'flex items-center justify-between p-3 rounded-xl bg-blue-50/70 border border-blue-200 transition';
-                    icon.className = 'status-icon w-5 h-5 rounded-full flex items-center justify-center bg-brand-orange text-white text-[10px] animate-spin border-2 border-white';
-                    icon.innerHTML = '⟳';
-                    label.className = 'status-label text-brand-orange font-bold';
-                    label.innerText = text || 'In Progress...';
+                    if (icon) {
+                        icon.className = 'status-icon w-5 h-5 rounded-full flex items-center justify-center bg-brand-orange text-white text-[10px] animate-spin border-2 border-white';
+                        icon.innerHTML = '⟳';
+                    }
+                    if (label) {
+                        label.className = 'status-label text-brand-orange font-bold';
+                        label.innerText = text || 'In Progress...';
+                    }
                 } else if (status === 'done') {
                     row.className = 'flex items-center justify-between p-3 rounded-xl bg-emerald-50/70 border border-emerald-200 transition';
-                    icon.className = 'status-icon w-5 h-5 rounded-full flex items-center justify-center bg-emerald-500 text-white font-bold text-[10px]';
-                    icon.innerHTML = '✓';
-                    label.className = 'status-label text-emerald-700 font-bold';
-                    label.innerText = text || 'Done';
+                    if (icon) {
+                        icon.className = 'status-icon w-5 h-5 rounded-full flex items-center justify-center bg-emerald-500 text-white font-bold text-[10px]';
+                        icon.innerHTML = '✓';
+                    }
+                    if (label) {
+                        label.className = 'status-label text-emerald-700 font-bold';
+                        label.innerText = text || 'Done';
+                    }
                 } else if (status === 'error') {
                     row.className = 'flex items-center justify-between p-3 rounded-xl bg-red-50/70 border border-red-200 transition';
-                    icon.className = 'status-icon w-5 h-5 rounded-full flex items-center justify-center bg-red-500 text-white font-bold text-[10px]';
-                    icon.innerHTML = '✗';
-                    label.className = 'status-label text-red-600 font-bold';
-                    label.innerText = text || 'Failed';
+                    if (icon) {
+                        icon.className = 'status-icon w-5 h-5 rounded-full flex items-center justify-center bg-red-500 text-white font-bold text-[10px]';
+                        icon.innerHTML = '✗';
+                    }
+                    if (label) {
+                        label.className = 'status-label text-red-600 font-bold';
+                        label.innerText = text || 'Failed';
+                    }
                 }
             };
 
@@ -641,6 +635,33 @@
             ];
 
             try {
+                const conn = val('db_connection', 'mysql');
+                const payload = {
+                    db_connection: conn,
+                    db_host: val('db_host', 'localhost'),
+                    db_port: val('db_port', 3306),
+                    db_database: conn === 'sqlite' ? val('sqlite_database', 'database/database.sqlite') : val('db_database', 'cityonline_db'),
+                    db_username: val('db_username', 'root'),
+                    db_password: val('db_password', ''),
+                    admin_name: val('admin_name', 'Administrator'),
+                    admin_username: val('admin_username', 'admin'),
+                    admin_email: val('admin_email', 'admin@cityonlineap.com'),
+                    admin_password: val('admin_password', ''),
+                    admin_password_confirmation: val('admin_password_confirmation', ''),
+                    company_name: val('company_name', 'City Online AP Pvt. Ltd.'),
+                    website_name: val('website_name', 'City Online AP'),
+                    website_url: originUrl,
+                    company_email: val('company_email', 'citybroadbandkkd@gmail.com'),
+                    phone_new: val('phone_new', '+91 97009 28928'),
+                    phone_support: val('phone_support', '+91 8844 6668999'),
+                    phone_office: val('phone_office', '+91 8844 2383333'),
+                    whatsapp: val('whatsapp', '+91 97009 28928'),
+                    office_address: val('office_address', 'City Broadband Services, Temple Street, Kakinada'),
+                    default_language: val('default_language', 'en'),
+                    timezone: val('timezone', 'Asia/Kolkata'),
+                    currency: val('currency', '₹'),
+                };
+
                 for (const s of steps) {
                     updateItemUI(s.id, 'running');
                     const res = await fetch('/install/step/' + s.step, {
@@ -666,28 +687,35 @@
 
                 // All 4 micro-steps completed successfully!
                 setTimeout(() => {
-                    document.getElementById('installing-spinner').classList.add('hidden');
+                    document.getElementById('installing-spinner')?.classList.add('hidden');
                     const liveWebUrl = originUrl + '/';
                     const liveAdminUrl = originUrl + '/admin/login';
 
-                    document.getElementById('complete-web-url').href = liveWebUrl;
-                    document.getElementById('complete-web-url').innerText = liveWebUrl;
+                    const webEl = document.getElementById('complete-web-url');
+                    if (webEl) { webEl.href = liveWebUrl; webEl.innerText = liveWebUrl; }
 
-                    document.getElementById('complete-admin-url').href = liveAdminUrl;
-                    document.getElementById('complete-admin-url').innerText = liveAdminUrl;
+                    const adminEl = document.getElementById('complete-admin-url');
+                    if (adminEl) { adminEl.href = liveAdminUrl; adminEl.innerText = liveAdminUrl; }
 
-                    document.getElementById('complete-admin-email').innerText = payload.admin_email;
+                    const emailEl = document.getElementById('complete-admin-email');
+                    if (emailEl) { emailEl.innerText = payload.admin_email; }
 
-                    document.getElementById('btn-visit-site').href = liveWebUrl;
-                    document.getElementById('btn-admin-login').href = liveAdminUrl;
+                    const siteBtn = document.getElementById('btn-visit-site');
+                    if (siteBtn) { siteBtn.href = liveWebUrl; }
 
-                    document.getElementById('install-complete').classList.remove('hidden');
+                    const adminBtn = document.getElementById('btn-admin-login');
+                    if (adminBtn) { adminBtn.href = liveAdminUrl; }
+
+                    document.getElementById('install-complete')?.classList.remove('hidden');
                 }, 400);
 
             } catch (err) {
-                document.getElementById('install-error').classList.remove('hidden');
-                document.getElementById('install-error').innerText = err.message || 'An error occurred during installation.';
-                btn.disabled = false;
+                const errEl = document.getElementById('install-error');
+                if (errEl) {
+                    errEl.classList.remove('hidden');
+                    errEl.innerText = err.message || 'An error occurred during installation.';
+                }
+                if (btn) btn.disabled = false;
             }
         }
     </script>
