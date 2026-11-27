@@ -9,7 +9,7 @@ lerna-debug.log*
 
 # Dependencies
 /node_modules
-/vendor
+# /vendor is committed for 100% turnkey cPanel Git deployment without terminal/composer requirements
 
 # Laravel Environment & Secrets
 .env

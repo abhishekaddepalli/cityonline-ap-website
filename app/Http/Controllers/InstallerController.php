@@ -259,7 +259,18 @@ class InstallerController extends Controller
                 Artisan::call('key:generate', ['--force' => true]);
             }
 
-            // 7. Write permanent installation lock file
+            // 7. Automatically create public storage symlink (no terminal needed)
+            try {
+                Artisan::call('storage:link');
+            } catch (\Throwable $symlinkError) {
+                $target = storage_path('app/public');
+                $link = public_path('storage');
+                if (!file_exists($link) && file_exists($target)) {
+                    @symlink($target, $link);
+                }
+            }
+
+            // 8. Write permanent installation lock file
             $lockData = json_encode([
                 'installed_at' => now()->toIso8601String(),
                 'version' => '1.0.0',
