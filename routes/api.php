@@ -7,6 +7,7 @@ Route::prefix('v1')->group(function () {
     Route::get('/init', [PublicApiController::class, 'getInitData']);
     Route::get('/plans', [PublicApiController::class, 'getPlans']);
     Route::get('/sections', [PublicApiController::class, 'getSections']);
+    Route::get('/brands', [PublicApiController::class, 'getBrands']);
     Route::get('/localities', [PublicApiController::class, 'getLocalities']);
     Route::get('/faqs', [PublicApiController::class, 'getFaqs']);
 

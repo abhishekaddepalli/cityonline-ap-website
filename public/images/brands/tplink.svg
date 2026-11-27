@@ -1,0 +1,7 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 160 50" fill="currentColor">
+  <g fill="#3ec5cc">
+    <path d="M22 14c-4.4 0-8 3.6-8 8v4c0 4.4 3.6 8 8 8h6v-6h-6c-1.1 0-2-.9-2-2v-4c0-1.1.9-2 2-2h10V14H22z"/>
+    <path d="M34 14v20h6V14h-6z"/>
+  </g>
+  <text x="52" y="32" font-family="'Plus Jakarta Sans', Arial, sans-serif" font-size="20" font-weight="800" fill="#2d3748" letter-spacing="-0.5">tp-link</text>
+</svg>

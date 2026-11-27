@@ -305,15 +305,40 @@ export function SelfService() {
 }
 
 export function AboutBlock({ withLink = true }: { withLink?: boolean }) {
-  const stats = [
+  const { sections } = useCms();
+  const about = sections?.about;
+
+  const defaultStats = [
     { n: "10+", l: "years in Kakinada" },
     { n: "40+", l: "localities covered" },
     { n: "24 hrs", l: "fault response" },
   ];
+
+  const stats = about?.content?.stats && Array.isArray(about.content.stats) && about.content.stats.length > 0
+    ? about.content.stats.map((s) => ({ n: s.number, l: s.label }))
+    : defaultStats;
+
+  const imgSrc = about?.content?.image_url || "/images/fibre-technician-kakinada.jpg";
+  const title = about?.title || "Our own network, our own people.";
+  const subtitle = about?.subtitle || "When it breaks, we are already on your street. No franchise in between, no call centre in another state. The same team lays the fibre, answers the phone and climbs the pole.";
+  const badge = about?.badge_text || "About City Online AP";
+
   return (
     <section className="container-x grid gap-10 py-16 sm:py-24 lg:grid-cols-2 lg:items-center">
       <Reveal className="relative">
-        <img src={tech.url} alt="A City Online technician running fibre above a Kakinada street" loading="lazy" width={1024} height={576} className="aspect-[4/3] w-full rounded-[22px] object-cover shadow-lift" />
+        <img
+          src={imgSrc}
+          alt="A City Online technician running fibre above a Kakinada street"
+          loading="lazy"
+          width={1024}
+          height={576}
+          onError={(e) => {
+            if (e.currentTarget.src !== window.location.origin + "/images/fibre-technician-kakinada.jpg") {
+              e.currentTarget.src = "/images/fibre-technician-kakinada.jpg";
+            }
+          }}
+          className="aspect-[4/3] w-full rounded-[22px] object-cover shadow-lift"
+        />
         <div className="absolute -bottom-6 left-4 right-4 grid grid-cols-3 gap-2 rounded-2xl border border-border bg-card p-4 shadow-lift sm:left-8 sm:right-8">
           {stats.map((s) => (
             <div key={s.l} className="text-center"><p className="text-xl font-extrabold text-accent sm:text-2xl">{s.n}</p><p className="text-[11px] text-muted-foreground sm:text-xs">{s.l}</p></div>
@@ -321,9 +346,9 @@ export function AboutBlock({ withLink = true }: { withLink?: boolean }) {
         </div>
       </Reveal>
       <Reveal delay={0.1} className="pt-6 lg:pt-0">
-        <p className="text-xs font-bold uppercase tracking-[0.22em] text-accent">About City Online AP</p>
-        <h2 className="mt-3 text-3xl font-extrabold text-primary sm:text-4xl">Our own network, our own people.</h2>
-        <p className="mt-4 text-lg text-muted-foreground">When it breaks, we are already on your street. No franchise in between, no call centre in another state. The same team lays the fibre, answers the phone and climbs the pole.</p>
+        <p className="text-xs font-bold uppercase tracking-[0.22em] text-accent">{badge}</p>
+        <h2 className="mt-3 text-3xl font-extrabold text-primary sm:text-4xl">{title}</h2>
+        <p className="mt-4 text-lg text-muted-foreground">{subtitle}</p>
         <ul className="mt-6 grid gap-3 sm:grid-cols-2">
           {[
             { i: Network, t: "Company-owned fibre network" },

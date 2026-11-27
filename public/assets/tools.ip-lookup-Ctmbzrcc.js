@@ -1,0 +1,1 @@
+import{g as e}from"./primitives-BtLI7DPO.js";import{t}from"./ToolPage-B6rGSqzj.js";import{i as n}from"./NetTools-DFIOwgCu.js";var r=e(),i=()=>(0,r.jsx)(t,{current:`/tools/ip-lookup`,title:`My IP Address`,sub:`See the public IP address your connection is using, and copy it in one tap.`,children:(0,r.jsx)(n,{})});export{i as component};

@@ -3,6 +3,7 @@
 namespace App\Http\Controllers\Api;
 
 use App\Http\Controllers\Controller;
+use App\Models\Brand;
 use App\Models\BroadbandPlan;
 use App\Models\CustomLink;
 use App\Models\Enquiry;
@@ -21,9 +22,12 @@ class PublicApiController extends Controller
 {
     public function getInitData()
     {
+        Brand::ensureTableExists();
+
         $settings = Setting::where('is_public', true)->pluck('value', 'key')->toArray();
         $plans = BroadbandPlan::active()->get();
         $sections = HomepageSection::active()->get()->keyBy('section_key');
+        $brands = Brand::active()->get();
         $headerMenu = NavigationMenu::where('location', 'header')->with('items')->first();
         $localities = Locality::active()->pluck('name')->toArray();
         $tools = InternetTool::active()->get();
@@ -34,12 +38,19 @@ class PublicApiController extends Controller
             'settings' => $settings,
             'plans' => $plans,
             'sections' => $sections,
+            'brands' => $brands,
             'navigation' => $headerMenu ? $headerMenu->items : [],
             'localities' => $localities,
             'tools' => $tools,
             'faqs' => $faqs,
             'links' => $links,
         ]);
+    }
+
+    public function getBrands()
+    {
+        Brand::ensureTableExists();
+        return response()->json(Brand::active()->get());
     }
 
     public function getPlans()

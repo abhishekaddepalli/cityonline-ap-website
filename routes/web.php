@@ -62,6 +62,13 @@ Route::middleware('auth')->prefix('admin')->group(function () {
     Route::get('/sections', [HomepageSectionController::class, 'index']);
     Route::put('/sections/{id}', [HomepageSectionController::class, 'update']);
 
+    // 25. Trusted Brands & Client Logos
+    Route::get('/brands', [\App\Http\Controllers\Admin\BrandController::class, 'index']);
+    Route::post('/brands', [\App\Http\Controllers\Admin\BrandController::class, 'store']);
+    Route::put('/brands/{id}', [\App\Http\Controllers\Admin\BrandController::class, 'update']);
+    Route::post('/brands/{id}/toggle', [\App\Http\Controllers\Admin\BrandController::class, 'toggle']);
+    Route::delete('/brands/{id}', [\App\Http\Controllers\Admin\BrandController::class, 'destroy']);
+
     // 3. Pages
     Route::get('/pages', [PageController::class, 'index']);
     Route::post('/pages', [PageController::class, 'store']);

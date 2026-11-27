@@ -522,5 +522,8 @@ class InitialWebsiteSeeder extends Seeder
         foreach ($pages as $pg) {
             Page::updateOrCreate(['slug' => $pg['slug']], $pg);
         }
+
+        // 13. Trusted Partner Brands
+        \App\Models\Brand::seedDefaultBrands();
     }
 }
